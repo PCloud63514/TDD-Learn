@@ -1,0 +1,3 @@
+rootProject.name = 'SmartPass'
+
+include ':components:module-admin'
