@@ -80,4 +80,21 @@ class AdminServiceImplTest {
         assertThat(spyAdminRepository.findAll_argumentRequest.getOffset()).isEqualTo(givenOffset);
         assertThat(spyAdminRepository.findAll_argumentRequest.getPageSize()).isEqualTo(givenPageSize);
     }
+
+    @Test
+    void duplicateIdCheck_returnValue() {
+        boolean id = adminService.duplicateIdCheck("id");
+
+        spyAdminRepository.existsById_returnValue = false;
+
+        assertThat(spyAdminRepository.existsById_returnValue).isEqualTo(id);
+
+    }
+
+    @Test
+    void duplicateIdCheck_passesIdToRepository() {
+        adminService.duplicateIdCheck("id");
+
+        assertThat(spyAdminRepository.existsById_argumentId).isEqualTo("id");
+    }
 }

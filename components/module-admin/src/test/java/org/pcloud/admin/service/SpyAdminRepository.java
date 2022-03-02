@@ -15,6 +15,8 @@ public class SpyAdminRepository implements AdminRepository {
     public Admin save_argumentAdmin;
     public Pageable findAll_argumentRequest;
     public List<Admin> findAll_returnValue = new ArrayList<>();
+    public String existsById_argumentId;
+    public boolean existsById_returnValue;
 
     @Override
     public List<Admin> findAll() {
@@ -85,7 +87,8 @@ public class SpyAdminRepository implements AdminRepository {
 
     @Override
     public boolean existsById(String s) {
-        return false;
+        existsById_argumentId = s;
+        return existsById_returnValue;
     }
 
     @Override

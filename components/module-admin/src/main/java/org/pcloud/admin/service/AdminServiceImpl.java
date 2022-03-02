@@ -36,6 +36,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public boolean duplicateIdCheck(String id) {
-        return false;
+        return adminRepository.existsById(id);
     }
 }
