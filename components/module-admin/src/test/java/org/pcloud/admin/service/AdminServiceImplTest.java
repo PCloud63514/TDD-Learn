@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.admin.StubLocalDateTimeProvider;
+import org.pcloud.admin.StubInitializedPasswordProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
@@ -19,13 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AdminServiceImplTest {
     AdminServiceImpl adminService;
     StubLocalDateTimeProvider stubLocalDateTimeProvider;
+    StubInitializedPasswordProvider stubInitializedPasswordProvider;
     SpyAdminRepository spyAdminRepository;
 
     @BeforeEach
     void setUp() {
         spyAdminRepository = new SpyAdminRepository();
         stubLocalDateTimeProvider = new StubLocalDateTimeProvider();
-        adminService = new AdminServiceImpl(stubLocalDateTimeProvider, spyAdminRepository);
+        stubInitializedPasswordProvider = new StubInitializedPasswordProvider();
+        adminService = new AdminServiceImpl(stubLocalDateTimeProvider, stubInitializedPasswordProvider, spyAdminRepository);
     }
 
     @Test
@@ -105,24 +108,30 @@ class AdminServiceImplTest {
     void passwordInit_returnAdmin() {
         stubLocalDateTimeProvider.now_returnValue = LocalDateTime.now();
         String givenId = "id";
+        String givenInitPassword = "initPassword";
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+        String givenRole = "ADMIN";
+        String givenStatus = "Default";
         spyAdminRepository.findById_returnValue = Optional.of(Admin.builder()
-                .id("id")
+                .id(givenId)
                 .password("password")
-                .role("ADMIN")
-                .status("Default")
+                .role(givenRole)
+                .status(givenStatus)
                 .needChangePassword(false)
                 .createAt(stubLocalDateTimeProvider.now())
                 .build());
 
+        stubInitializedPasswordProvider.initializedPassword_returnValue = givenInitPassword;
+
         Admin admin = adminService.passwordInit(givenRequest);
 
-        assertThat(admin.getId()).isEqualTo("id");
-        assertThat(admin.getPassword()).isEqualTo("password");
-        assertThat(admin.getRole()).isEqualTo("ADMIN");
-        assertThat(admin.getStatus()).isEqualTo("Default");
+        assertThat(admin.getId()).isEqualTo(givenId);
+        assertThat(admin.getPassword()).isEqualTo(stubInitializedPasswordProvider.initializedPassword());
+        assertThat(admin.getRole()).isEqualTo(givenRole);
+        assertThat(admin.getStatus()).isEqualTo(givenStatus);
         assertThat(admin.isNeedChangePassword()).isEqualTo(false);
         assertThat(admin.getCreateAt()).isEqualTo(stubLocalDateTimeProvider.now());
+        assertThat(spyAdminRepository.findById_returnValue.get().getPassword()).isEqualTo(stubInitializedPasswordProvider.initializedPassword());
     }
 
     @Test

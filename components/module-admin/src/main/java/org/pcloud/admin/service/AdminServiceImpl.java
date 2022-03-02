@@ -1,6 +1,7 @@
 package org.pcloud.admin.service;
 
 import lombok.RequiredArgsConstructor;
+import org.pcloud.admin.InitializedPasswordProvider;
 import org.pcloud.admin.LocalDateTimeProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class AdminServiceImpl implements AdminService {
     private final LocalDateTimeProvider localDateTimeProvider;
+    private final InitializedPasswordProvider initializedPasswordProvider;
     private final AdminRepository adminRepository;
 
     @Override
@@ -42,14 +44,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin passwordInit(AdminPasswordInitialRequest request) {
-        adminRepository.findById(request.getId()).orElseThrow(RuntimeException::new);
-        return Admin.builder()
-                .id("id")
-                .password("password")
-                .role("ADMIN")
-                .status("Default")
-                .needChangePassword(false)
-                .createAt(localDateTimeProvider.now())
-                .build();
+        Admin admin = adminRepository.findById(request.getId())
+                .orElseThrow(RuntimeException::new);
+
+        admin.update(initializedPasswordProvider.initializedPassword());
+
+        return admin;
     }
 }

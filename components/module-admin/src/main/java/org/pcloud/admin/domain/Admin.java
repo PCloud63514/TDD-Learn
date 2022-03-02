@@ -43,4 +43,8 @@ public class Admin {
                 .createAt(createAt)
                 .build();
     }
+
+    public void update(String password) {
+        this.password = password;
+    }
 }
