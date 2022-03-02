@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.admin.StubLocalDateTimeProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.springframework.data.domain.PageRequest;
@@ -96,5 +97,31 @@ class AdminServiceImplTest {
         adminService.duplicateIdCheck("id");
 
         assertThat(spyAdminRepository.existsById_argumentId).isEqualTo("id");
+    }
+
+    @Test
+    void passwordInit_returnAdmin() {
+        stubLocalDateTimeProvider.now_returnValue = LocalDateTime.now();
+        String givenId = "id";
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+
+        Admin admin = adminService.passwordInit(givenRequest);
+
+        assertThat(admin.getId()).isEqualTo("id");
+        assertThat(admin.getPassword()).isEqualTo("password");
+        assertThat(admin.getRole()).isEqualTo("ADMIN");
+        assertThat(admin.getStatus()).isEqualTo("Default");
+        assertThat(admin.isNeedChangePassword()).isEqualTo(false);
+        assertThat(admin.getCreateAt()).isEqualTo(stubLocalDateTimeProvider.now());
+    }
+
+    @Test
+    void passwordInit_passesIdToRepository() {
+        String givenId = "id";
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+
+        adminService.passwordInit(givenRequest);
+
+        assertThat(spyAdminRepository.findById_argumentId).isEqualTo(givenId);
     }
 }

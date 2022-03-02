@@ -42,6 +42,14 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin passwordInit(AdminPasswordInitialRequest request) {
-        return null;
+        adminRepository.findById(request.getId());
+        return Admin.builder()
+                .id("id")
+                .password("password")
+                .role("ADMIN")
+                .status("Default")
+                .needChangePassword(false)
+                .createAt(localDateTimeProvider.now())
+                .build();
     }
 }
