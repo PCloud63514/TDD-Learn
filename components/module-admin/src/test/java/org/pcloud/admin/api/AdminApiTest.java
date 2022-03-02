@@ -18,8 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class AdminApiTest {
     private MockMvc mockMvc;
@@ -87,6 +86,7 @@ class AdminApiTest {
     void getAdmins_returnAdmins() throws Exception {
         spyAdminService.getAdmins_returnValue = List.of(new AdminSearchResponse("id", "ADMIN",
                 "Default", true, LocalDateTime.of(2022, 2, 22, 20, 20, 20)));
+
         mockMvc.perform(get("/admin"))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id", equalTo("id")))
@@ -119,5 +119,26 @@ class AdminApiTest {
 
         assertThat(spyAdminService.getAdmins_argumentRequest.getOffset()).isEqualTo(givenOffset);
         assertThat(spyAdminService.getAdmins_argumentRequest.getPageSize()).isEqualTo(givenPageSize);
+    }
+
+    @Test
+    void duplicateIdCheck_returnOkHttpStatus() throws Exception {
+        mockMvc.perform(get("/admin/duplicate/id/{id}", "qwe"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void duplicateIdCheck_returnResult() throws Exception {
+        spyAdminService.duplicateIdCheck_returnValue = true;
+
+        mockMvc.perform(get("/admin/duplicate/id/{id}", "qwe"))
+                .andExpect(content().string(equalTo("true")));
+    }
+
+    @Test
+    void duplicatedIdCheck_passesIdToService() throws Exception {
+        mockMvc.perform(get("/admin/duplicate/id/{id}", "id"));
+
+        assertThat(spyAdminService.duplicateIdCheck_argumentId).isEqualTo("id");
     }
 }

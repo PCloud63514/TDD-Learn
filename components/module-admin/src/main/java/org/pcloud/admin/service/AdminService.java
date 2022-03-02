@@ -11,4 +11,6 @@ public interface AdminService {
     Admin joinAdmin(AdminJoinRequest request);
 
     List<AdminSearchResponse> getAdmins(PageRequest pageRequest);
+
+    boolean duplicateIdCheck(String id);
 }

@@ -10,9 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Validated
@@ -32,5 +29,10 @@ public class AdminApi {
     public List<AdminSearchResponse> getAdmins(@RequestParam(name="size", defaultValue = "10") int size,
                                                @RequestParam(name="offset", defaultValue = "0") int offset) {
         return adminService.getAdmins(PageRequest.of(offset, size));
+    }
+
+    @GetMapping("duplicate/id/{id}")
+    public boolean duplicateIdCheck(@PathVariable(name = "id") String id) {
+        return adminService.duplicateIdCheck(id);
     }
 }

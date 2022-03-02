@@ -13,6 +13,8 @@ public class SpyAdminService implements AdminService {
     public AdminJoinRequest joinAdmin_argumentRequest;
     public List<AdminSearchResponse> getAdmins_returnValue;
     public PageRequest getAdmins_argumentRequest;
+    public String duplicateIdCheck_argumentId;
+    public boolean duplicateIdCheck_returnValue;
 
     @Override
     public Admin joinAdmin(AdminJoinRequest request) {
@@ -24,5 +26,11 @@ public class SpyAdminService implements AdminService {
     public List<AdminSearchResponse> getAdmins(PageRequest pageRequest) {
         this.getAdmins_argumentRequest = pageRequest;
         return getAdmins_returnValue;
+    }
+
+    @Override
+    public boolean duplicateIdCheck(String id) {
+        this.duplicateIdCheck_argumentId = id;
+        return duplicateIdCheck_returnValue;
     }
 }

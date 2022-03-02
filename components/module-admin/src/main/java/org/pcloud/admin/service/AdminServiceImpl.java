@@ -33,4 +33,9 @@ public class AdminServiceImpl implements AdminService {
                 .map(r -> new AdminSearchResponse(r.getId(), r.getRole(), r.getStatus(), r.isNeedChangePassword(), r.getCreateAt()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean duplicateIdCheck(String id) {
+        return false;
+    }
 }
