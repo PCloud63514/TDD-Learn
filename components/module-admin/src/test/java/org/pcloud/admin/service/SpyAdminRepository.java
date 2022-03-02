@@ -6,6 +6,7 @@ import org.pcloud.admin.repository.AdminRepository;
 import org.springframework.data.domain.*;
 import org.springframework.data.repository.query.FluentQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 public class SpyAdminRepository implements AdminRepository {
     public Admin save_argumentAdmin;
     public Pageable findAll_argumentRequest;
+    public List<Admin> findAll_returnValue = new ArrayList<>();
 
     @Override
     public List<Admin> findAll() {
@@ -27,7 +29,7 @@ public class SpyAdminRepository implements AdminRepository {
     @Override
     public Page<Admin> findAll(Pageable pageable) {
         findAll_argumentRequest = pageable;
-        return null;
+        return new PageImpl<Admin>(findAll_returnValue, pageable, findAll_returnValue.size());
     }
 
     @Override

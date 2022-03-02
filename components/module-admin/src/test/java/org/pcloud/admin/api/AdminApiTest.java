@@ -87,7 +87,6 @@ class AdminApiTest {
     void getAdmins_returnAdmins() throws Exception {
         spyAdminService.getAdmins_returnValue = List.of(new AdminSearchResponse("id", "ADMIN",
                 "Default", true, LocalDateTime.of(2022, 2, 22, 20, 20, 20)));
-
         mockMvc.perform(get("/admin"))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id", equalTo("id")))

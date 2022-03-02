@@ -32,4 +32,15 @@ public class Admin {
         this.needChangePassword = needChangePassword;
         this.createAt = createAt;
     }
+
+    public static Admin create(String id, String password, String role, String status, LocalDateTime createAt) {
+        return Admin.builder()
+                .id(id)
+                .password(password)
+                .role(role)
+                .status(status)
+                .needChangePassword(false)
+                .createAt(createAt)
+                .build();
+    }
 }
