@@ -1,5 +1,6 @@
 package org.pcloud.admin.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.admin.StubLocalDateTimeProvider;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,6 +106,14 @@ class AdminServiceImplTest {
         stubLocalDateTimeProvider.now_returnValue = LocalDateTime.now();
         String givenId = "id";
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+        spyAdminRepository.findById_returnValue = Optional.of(Admin.builder()
+                .id("id")
+                .password("password")
+                .role("ADMIN")
+                .status("Default")
+                .needChangePassword(false)
+                .createAt(stubLocalDateTimeProvider.now())
+                .build());
 
         Admin admin = adminService.passwordInit(givenRequest);
 
@@ -119,9 +129,28 @@ class AdminServiceImplTest {
     void passwordInit_passesIdToRepository() {
         String givenId = "id";
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+        spyAdminRepository.findById_returnValue = Optional.of(Admin.builder()
+                .id("id")
+                .password("password")
+                .role("ADMIN")
+                .status("Default")
+                .needChangePassword(false)
+                .createAt(stubLocalDateTimeProvider.now())
+                .build());
 
         adminService.passwordInit(givenRequest);
 
         assertThat(spyAdminRepository.findById_argumentId).isEqualTo(givenId);
+    }
+
+    @Test
+    void passwordInit_notExistsException() {
+        String givenId = "id";
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+        spyAdminRepository.findById_returnValue = Optional.empty();
+
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            adminService.passwordInit(givenRequest);
+        });
     }
 }

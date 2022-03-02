@@ -42,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin passwordInit(AdminPasswordInitialRequest request) {
-        adminRepository.findById(request.getId());
+        adminRepository.findById(request.getId()).orElseThrow(RuntimeException::new);
         return Admin.builder()
                 .id("id")
                 .password("password")
