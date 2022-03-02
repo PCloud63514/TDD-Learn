@@ -3,6 +3,7 @@ package org.pcloud.admin.service;
 import lombok.RequiredArgsConstructor;
 import org.pcloud.admin.LocalDateTimeProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;
@@ -37,5 +38,10 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public boolean duplicateIdCheck(String id) {
         return adminRepository.existsById(id);
+    }
+
+    @Override
+    public Admin passwordInit(AdminPasswordInitialRequest request) {
+        return null;
     }
 }

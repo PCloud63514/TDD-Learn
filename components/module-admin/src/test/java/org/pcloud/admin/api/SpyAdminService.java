@@ -1,6 +1,7 @@
 package org.pcloud.admin.api;
 
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
@@ -15,6 +16,8 @@ public class SpyAdminService implements AdminService {
     public PageRequest getAdmins_argumentRequest;
     public String duplicateIdCheck_argumentId;
     public boolean duplicateIdCheck_returnValue;
+    public AdminPasswordInitialRequest passwordInit_argumentRequest;
+    public Admin passwordInit_returnValue;
 
     @Override
     public Admin joinAdmin(AdminJoinRequest request) {
@@ -32,5 +35,11 @@ public class SpyAdminService implements AdminService {
     public boolean duplicateIdCheck(String id) {
         this.duplicateIdCheck_argumentId = id;
         return duplicateIdCheck_returnValue;
+    }
+
+    @Override
+    public Admin passwordInit(AdminPasswordInitialRequest request) {
+        this.passwordInit_argumentRequest = request;
+        return passwordInit_returnValue;
     }
 }

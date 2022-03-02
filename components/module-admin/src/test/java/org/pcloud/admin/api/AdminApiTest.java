@@ -1,11 +1,12 @@
 package org.pcloud.admin.api;
 
-import org.pcloud.admin.data.request.AdminJoinRequest;
-import org.pcloud.admin.data.response.AdminSearchResponse;
-import org.pcloud.admin.domain.Admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
+import org.pcloud.admin.data.response.AdminSearchResponse;
+import org.pcloud.admin.domain.Admin;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -15,8 +16,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -140,5 +140,54 @@ class AdminApiTest {
         mockMvc.perform(get("/admin/duplicate/id/{id}", "id"));
 
         assertThat(spyAdminService.duplicateIdCheck_argumentId).isEqualTo("id");
+    }
+
+    @Test
+    void passwordInitial_returnOkHttpStatus() throws Exception {
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest("id2");
+
+        mockMvc.perform(patch("/admin/init/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(givenRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void passwordInitial_returnAdmin() throws Exception {
+        String givenId = "id2";
+        String givenPassword = "initPassword2";
+        spyAdminService.passwordInit_returnValue = Admin.create(givenId, givenPassword, "ADMIN", "Default", LocalDateTime.now());
+
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+
+        mockMvc.perform(patch("/admin/init/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(givenRequest)))
+                .andExpect(jsonPath("$.id", equalTo("id2")));
+    }
+
+    @Test
+    void passwordInitial_passesAdminPasswordInitialRequestRoService() throws Exception {
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest("id2");
+
+        mockMvc.perform(patch("/admin/init/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(givenRequest)));
+
+        assertThat(spyAdminService.passwordInit_argumentRequest.getId()).isEqualTo(givenRequest.getId());
+    }
+
+    @Test
+    void passwordInitial_returnAdminToService() throws Exception {
+        String givenId = "id2";
+        String givenPassword = "initPassword2";
+        AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
+        spyAdminService.passwordInit_returnValue = Admin.create(givenId, givenPassword, "ADMIN", "Default", LocalDateTime.now());
+
+        mockMvc.perform(patch("/admin/init/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(givenRequest)))
+                .andExpect(jsonPath("$.id", equalTo(givenId)))
+                .andExpect(jsonPath("$.password", equalTo(givenPassword)));
     }
 }

@@ -2,6 +2,7 @@ package org.pcloud.admin.api;
 
 import lombok.RequiredArgsConstructor;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
@@ -34,5 +35,10 @@ public class AdminApi {
     @GetMapping("duplicate/id/{id}")
     public boolean duplicateIdCheck(@PathVariable(name = "id") String id) {
         return adminService.duplicateIdCheck(id);
+    }
+
+    @PatchMapping("init/password")
+    public Admin passwordInitial(@RequestBody AdminPasswordInitialRequest request) {
+        return adminService.passwordInit(request);
     }
 }
