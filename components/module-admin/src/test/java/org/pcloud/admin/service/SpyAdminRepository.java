@@ -3,10 +3,7 @@ package org.pcloud.admin.service;
 import org.aspectj.lang.JoinPoint;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.repository.query.FluentQuery;
 
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.function.Function;
 
 public class SpyAdminRepository implements AdminRepository {
     public Admin save_argumentAdmin;
+    public Pageable findAll_argumentRequest;
 
     @Override
     public List<Admin> findAll() {
@@ -28,6 +26,7 @@ public class SpyAdminRepository implements AdminRepository {
 
     @Override
     public Page<Admin> findAll(Pageable pageable) {
+        findAll_argumentRequest = pageable;
         return null;
     }
 

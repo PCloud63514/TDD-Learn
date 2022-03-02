@@ -32,6 +32,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<AdminSearchResponse> getAdmins(PageRequest pageRequest) {
-        return null;
+        adminRepository.findAll(pageRequest);
+
+        return List.of(new AdminSearchResponse("id", "ADMIN", "Default", false, localDateTimeProvider.now()));
     }
 }
