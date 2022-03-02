@@ -1,6 +1,7 @@
 package org.pcloud.admin.api;
 
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,11 +11,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,6 +85,9 @@ class AdminApiTest {
 
     @Test
     void getAdmins_returnAdmins() throws Exception {
+        spyAdminService.getAdmins_returnValue = List.of(new AdminSearchResponse("id", "ADMIN",
+                "Default", true, LocalDateTime.of(2022, 2, 22, 20, 20, 20)));
+
         mockMvc.perform(get("/admin"))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id", equalTo("id")))
@@ -89,6 +95,30 @@ class AdminApiTest {
                 .andExpect(jsonPath("$[0].status", equalTo("Default")))
                 .andExpect(jsonPath("$[0].needChangePassword", equalTo(true)))
                 .andExpect(jsonPath("$[0].createAt", equalTo("2022-02-22 20:20:20")))
-                .andExpect(status().isOk());
+                .andDo(print());
+    }
+
+    @Test
+    void getAdmins_returnAdminsZero() throws Exception {
+        spyAdminService.getAdmins_returnValue = List.of();
+
+        mockMvc.perform(get("/admin")
+                        .param("offset", "0")
+                        .param("size", "1"))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void getAdmins_passesPageRequestToService() throws Exception {
+        Long givenOffset = 0L;
+        Integer givenPageSize = 1;
+
+        mockMvc.perform(get("/admin")
+                .param("offset", givenOffset.toString())
+                .param("size", givenPageSize.toString()));
+
+        assertThat(spyAdminService.getAdmins_argumentRequest.getOffset()).isEqualTo(givenOffset);
+        assertThat(spyAdminService.getAdmins_argumentRequest.getPageSize()).isEqualTo(givenPageSize);
     }
 }
