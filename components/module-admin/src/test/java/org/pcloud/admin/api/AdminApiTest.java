@@ -39,8 +39,14 @@ class AdminApiTest {
 
     @Test
     void joinAdmin_returnAdmin() throws Exception {
-        spyAdminService.joinAdmin_returnValue = new Admin("id", "password", "ADMIN", "Default", true,
-                LocalDateTime.of(2022, 2, 22, 20, 20, 20));
+        spyAdminService.joinAdmin_returnValue = Admin.builder()
+                .id("id")
+                .password("password")
+                .role("ADMIN")
+                .status("Default")
+                .needChangePassword(true)
+                .createAt(LocalDateTime.of(2022, 2, 22, 20, 20, 20))
+                .build();
 
         mockMvc.perform(post("/admin/join")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +81,14 @@ class AdminApiTest {
     }
 
     @Test
-    void getAdmins_returnAdmins() {
-
+    void getAdmins_returnAdmins() throws Exception {
+        mockMvc.perform(get("/admin"))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id", equalTo("id")))
+                .andExpect(jsonPath("$[0].role", equalTo("ADMIN")))
+                .andExpect(jsonPath("$[0].status", equalTo("Default")))
+                .andExpect(jsonPath("$[0].needChangePassword", equalTo(true)))
+                .andExpect(jsonPath("$[0].createAt", equalTo("2022-02-22 20:20:20")))
+                .andExpect(status().isOk());
     }
 }
