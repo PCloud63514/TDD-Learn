@@ -23,7 +23,6 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
     @Override
     public JwtToken generate(JwtTokenGenerateRequest request) {
         String requestId = uuidProvider.randomUUID().toString();
-
         Date date = dateProvider.now();
 
         String token = _generate(requestId, request.getRole(), date, request.getValidityMS());
@@ -51,8 +50,10 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
+
         String role = body.get("role", String.class);
         Long validity = body.get("validity", Long.class);
+
         return new JwtTokenInformation<Token>(new Token(token), body.getSubject(), role, validity, body.getIssuedAt());
     }
 }
