@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.support.token.core.StubDateProvider;
 import org.pcloud.support.token.core.StubUuidProvider;
+import org.pcloud.support.token.core.Token;
 
 import java.util.Date;
 import java.util.UUID;
@@ -34,6 +35,8 @@ class JwtTokenProviderTest {
         stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
         Date date = stubDateProvider.now();
         Claims claims = Jwts.claims().setSubject(stubUuidProvider.randomUUID().toString());
+        claims.put("role", givenRole);
+        claims.put("validity", givenValidityMS);
         String givenToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(date)
@@ -52,5 +55,24 @@ class JwtTokenProviderTest {
 
         assertThat(token.getToken()).isEqualTo(givenToken);
         assertThat(token.getRefresh()).isEqualTo(givenRefresh);
+    }
+
+    @Test
+    void getInformation_returnValue() {
+        String givenRole = "role";
+        long givenValidityMS = 10000;
+        long givenRefreshValidityMS = 100000;
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenRole, givenValidityMS, givenRefreshValidityMS);
+        stubDateProvider.now_returnValue = new Date();
+        stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
+
+        JwtToken jwtToken = jwtTokenProvider.generate(givenRequest);
+        JwtTokenInformation<Token> tokenInformation = jwtTokenProvider.getInformation(jwtToken.getToken());
+        JwtTokenInformation<Token> refreshInformation = jwtTokenProvider.getInformation(jwtToken.getRefresh());
+
+        assertThat(tokenInformation.token()).isEqualTo(jwtToken.getToken());
+        assertThat(tokenInformation.getValidityMS()).isEqualTo(givenValidityMS);
+        assertThat(tokenInformation.getRole()).isEqualTo(givenRole);
+        assertThat(tokenInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(stubDateProvider.now().toInstant().getEpochSecond());
     }
 }

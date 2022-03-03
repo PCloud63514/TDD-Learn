@@ -21,7 +21,7 @@ public class JwtTokenService implements TokenService<JwtToken, JwtTokenGenerateR
         return null;
     }
 
-    public JwtTokenInformation getTokenInformation(String token) {
+    public JwtTokenInformation<JwtToken> getTokenInformation(String token) {
         return null;
     }
 

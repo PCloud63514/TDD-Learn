@@ -1,18 +1,19 @@
 package org.pcloud.support.token.jwt;
 
 import lombok.Getter;
+import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.core.TokenInformation;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
-public class JwtTokenInformation<T extends JwtToken> extends TokenInformation<T> {
+public class JwtTokenInformation<T extends Token> extends TokenInformation<T> {
+    private final String subject;
     private final String role;
-    private final long refreshValidityMS;
 
-    public JwtTokenInformation(T token, String role, long validityMS, long refreshValidityMS, LocalDateTime createAt) {
-        super(token, validityMS, createAt);
+    public JwtTokenInformation(T token, String subject, String role, long validityMS, Date issuedAt) {
+        super(token, validityMS, issuedAt);
+        this.subject = subject;
         this.role = role;
-        this.refreshValidityMS = refreshValidityMS;
     }
 }

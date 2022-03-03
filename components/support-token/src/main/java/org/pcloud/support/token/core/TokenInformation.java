@@ -2,17 +2,21 @@ package org.pcloud.support.token.core;
 
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 public class TokenInformation<T extends Token> {
     private final T token;
     private final long validityMS;
-    private final LocalDateTime createAt;
+    private final Date issuedAt;
 
-    public TokenInformation(T token, long validityMS, LocalDateTime createAt) {
+    public TokenInformation(T token, long validityMS, Date issuedAt) {
         this.token = token;
         this.validityMS = validityMS;
-        this.createAt = createAt;
+        this.issuedAt = issuedAt;
+    }
+
+    public String token() {
+        return token.getToken();
     }
 }

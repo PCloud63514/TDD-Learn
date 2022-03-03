@@ -1,12 +1,10 @@
 package org.pcloud.support.token.jwt;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.support.token.core.StubDateProvider;
 import org.pcloud.support.token.core.StubTokenProvider;
 import org.pcloud.support.token.core.StubUuidProvider;
-import org.pcloud.support.token.core.Token;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
