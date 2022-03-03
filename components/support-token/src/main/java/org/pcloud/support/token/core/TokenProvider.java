@@ -1,4 +1,4 @@
-package org.pcloud.support.token;
+package org.pcloud.support.token.core;
 
 import javax.servlet.http.HttpServletResponse;
 
