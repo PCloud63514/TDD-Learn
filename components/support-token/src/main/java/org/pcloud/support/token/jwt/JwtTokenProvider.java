@@ -22,19 +22,21 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
 
     @Override
     public JwtToken generate(JwtTokenGenerateRequest request) {
-        Claims claims = Jwts.claims().setSubject(uuidProvider.randomUUID().toString());
-        claims.put("role", request.getRole());
-        claims.put("validity", request.getValidityMS());
+        String requestId = uuidProvider.randomUUID().toString();
 
         Date date = dateProvider.now();
 
-        String token = _generate(claims, date, request.getValidityMS());
-        String refresh = _generate(claims, date, request.getRefreshValidityMS());
+        String token = _generate(requestId, request.getRole(), date, request.getValidityMS());
+        String refresh = _generate(requestId, request.getRole(), date, request.getRefreshValidityMS());
 
         return new JwtToken(token, refresh);
     }
 
-    private String _generate(Claims claims, Date date, long validityMS) {
+    private String _generate(String requestId, String role, Date date, long validityMS) {
+        Claims claims = Jwts.claims().setSubject(requestId);
+        claims.put("role", role);
+        claims.put("validity", validityMS);
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(date)

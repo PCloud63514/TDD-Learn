@@ -34,17 +34,23 @@ class JwtTokenProviderTest {
         stubDateProvider.now_returnValue = new Date();
         stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
         Date date = stubDateProvider.now();
-        Claims claims = Jwts.claims().setSubject(stubUuidProvider.randomUUID().toString());
-        claims.put("role", givenRole);
-        claims.put("validity", givenValidityMS);
+        String requestId = stubUuidProvider.randomUUID().toString();
+
+        Claims tokenClaims = Jwts.claims().setSubject(requestId);
+        tokenClaims.put("role", givenRole);
+        tokenClaims.put("validity", givenValidityMS);
+        Claims refreshClaims = Jwts.claims().setSubject(requestId);
+        refreshClaims.put("role", givenRole);
+        refreshClaims.put("validity", givenRefreshValidityMS);
+
         String givenToken = Jwts.builder()
-                .setClaims(claims)
+                .setClaims(tokenClaims)
                 .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + givenValidityMS))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
         String givenRefresh = Jwts.builder()
-                .setClaims(claims)
+                .setClaims(refreshClaims)
                 .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + givenRefreshValidityMS))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -74,5 +80,10 @@ class JwtTokenProviderTest {
         assertThat(tokenInformation.getValidityMS()).isEqualTo(givenValidityMS);
         assertThat(tokenInformation.getRole()).isEqualTo(givenRole);
         assertThat(tokenInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(stubDateProvider.now().toInstant().getEpochSecond());
+
+        assertThat(refreshInformation.token()).isEqualTo(jwtToken.getRefresh());
+        assertThat(refreshInformation.getValidityMS()).isEqualTo(givenRefreshValidityMS);
+        assertThat(refreshInformation.getRole()).isEqualTo(givenRole);
+        assertThat(refreshInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(stubDateProvider.now().toInstant().getEpochSecond());
     }
 }
