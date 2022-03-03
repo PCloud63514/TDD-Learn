@@ -1,4 +1,4 @@
-package org.pcloud.admin;
+package org.pcloud.admin.provider;
 
 import java.time.LocalDateTime;
 

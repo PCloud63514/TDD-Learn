@@ -1,8 +1,9 @@
 package org.pcloud.admin.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pcloud.admin.InitializedPasswordProvider;
-import org.pcloud.admin.LocalDateTimeProvider;
+import org.pcloud.admin.data.request.AdminLoginRequest;
+import org.pcloud.admin.provider.InitializedPasswordProvider;
+import org.pcloud.admin.provider.LocalDateTimeProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
@@ -50,5 +51,10 @@ public class AdminServiceImpl implements AdminService {
         admin.update(initializedPasswordProvider.initializedPassword());
 
         return admin;
+    }
+
+    @Override
+    public void login(AdminLoginRequest request) {
+
     }
 }

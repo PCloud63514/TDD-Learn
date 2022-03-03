@@ -1,4 +1,6 @@
-package org.pcloud.admin;
+package org.pcloud.admin.provider;
+
+import org.pcloud.admin.provider.InitializedPasswordProvider;
 
 public class StubInitializedPasswordProvider extends InitializedPasswordProvider {
     public String initializedPassword_returnValue;

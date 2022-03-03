@@ -1,6 +1,7 @@
 package org.pcloud.admin.service;
 
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
@@ -16,4 +17,6 @@ public interface AdminService {
     boolean duplicateIdCheck(String id);
 
     Admin passwordInit(AdminPasswordInitialRequest request);
+
+    void login(AdminLoginRequest request);
 }

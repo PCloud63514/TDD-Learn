@@ -1,6 +1,8 @@
 package org.pcloud.admin.api;
 
+import org.aspectj.lang.JoinPoint;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
@@ -18,6 +20,7 @@ public class SpyAdminService implements AdminService {
     public boolean duplicateIdCheck_returnValue;
     public AdminPasswordInitialRequest passwordInit_argumentRequest;
     public Admin passwordInit_returnValue;
+    public AdminLoginRequest login_argumentRequest;
 
     @Override
     public Admin joinAdmin(AdminJoinRequest request) {
@@ -41,5 +44,10 @@ public class SpyAdminService implements AdminService {
     public Admin passwordInit(AdminPasswordInitialRequest request) {
         this.passwordInit_argumentRequest = request;
         return passwordInit_returnValue;
+    }
+
+    @Override
+    public void login(AdminLoginRequest request) {
+        this.login_argumentRequest = request;
     }
 }

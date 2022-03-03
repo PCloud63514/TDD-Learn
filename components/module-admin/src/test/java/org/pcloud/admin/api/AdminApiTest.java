@@ -190,4 +190,22 @@ class AdminApiTest {
                 .andExpect(jsonPath("$.id", equalTo(givenId)))
                 .andExpect(jsonPath("$.password", equalTo(givenPassword)));
     }
+
+    @Test
+    void login_okHttpStatus() throws Exception {
+        mockMvc.perform(post("/admin/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void login_passesLoginRequestToService() throws Exception {
+        mockMvc.perform(post("/admin/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"id\":\"id\", \"password\":\"password\"}"));
+
+        assertThat(spyAdminService.login_argumentRequest.getId()).isEqualTo("id");
+        assertThat(spyAdminService.login_argumentRequest.getPassword()).isEqualTo("password");
+    }
 }
