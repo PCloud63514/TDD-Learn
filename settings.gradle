@@ -2,3 +2,5 @@ rootProject.name = 'SmartPass'
 
 include ':applications:app-smartpass'
 include ':components:module-admin'
+include ':components:support-token'
+include ':components:support-redis'
