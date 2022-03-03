@@ -2,15 +2,11 @@ package org.pcloud.support.token.core;
 
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 public class TokenGenerateRequest {
-    private final long validity;
-    private final LocalDateTime createAt;
+    private final long validityMS;
 
-    public TokenGenerateRequest(long validity, LocalDateTime createAt) {
-        this.validity = validity;
-        this.createAt = createAt;
+    public TokenGenerateRequest(long validityMS) {
+        this.validityMS = validityMS;
     }
 }

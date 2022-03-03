@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 @Getter
 public class JwtTokenGenerateRequest extends TokenGenerateRequest {
     private final String role;
-    private final long refreshValidity;
+    private final long refreshValidityMS;
 
-    public JwtTokenGenerateRequest(String role, long validity, long refreshValidity, LocalDateTime createAt) {
-        super(validity, createAt);
+    public JwtTokenGenerateRequest(String role, long validityMS, long refreshValidityMS) {
+        super(validityMS);
         this.role = role;
-        this.refreshValidity = refreshValidity;
+        this.refreshValidityMS = refreshValidityMS;
     }
 }
