@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminSearchResponse;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Validated
 @RequiredArgsConstructor
@@ -28,8 +26,8 @@ public class AdminApi {
     }
 
     @GetMapping
-    public List<AdminSearchResponse> getAdmins(@RequestParam(name="size", defaultValue = "10") int size,
-                                               @RequestParam(name="offset", defaultValue = "0") int offset) {
+    public AdminGetsResponse getAdmins(@RequestParam(name="size", defaultValue = "10") int size,
+                                       @RequestParam(name="offset", defaultValue = "0") int offset) {
         return adminService.getAdmins(PageRequest.of(offset, size));
     }
 

@@ -2,6 +2,7 @@ package org.pcloud.admin.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pcloud.admin.data.request.AdminLoginRequest;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.provider.InitializedPasswordProvider;
 import org.pcloud.admin.provider.LocalDateTimeProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
@@ -30,12 +31,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<AdminSearchResponse> getAdmins(PageRequest pageRequest) {
+    public AdminGetsResponse getAdmins(PageRequest pageRequest) {
+        long total = adminRepository.count();
         Page<Admin> findAllResponse = adminRepository.findAll(pageRequest);
 
-        return findAllResponse.stream()
+        List<AdminSearchResponse> list = findAllResponse.stream()
                 .map(r -> new AdminSearchResponse(r.getId(), r.getRole(), r.getStatus(), r.isNeedChangePassword(), r.getCreateAt()))
                 .collect(Collectors.toList());
+        return new AdminGetsResponse((int)total, list);
     }
 
     @Override

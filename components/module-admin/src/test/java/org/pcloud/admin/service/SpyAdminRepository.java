@@ -1,6 +1,5 @@
 package org.pcloud.admin.service;
 
-import org.aspectj.lang.JoinPoint;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;
 import org.springframework.data.domain.*;
@@ -43,7 +42,7 @@ public class SpyAdminRepository implements AdminRepository {
 
     @Override
     public long count() {
-        return 0;
+        return findAll_returnValue.size();
     }
 
     @Override

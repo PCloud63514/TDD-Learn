@@ -3,16 +3,14 @@ package org.pcloud.admin.service;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminSearchResponse;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.List;
 
 public interface AdminService {
     Admin joinAdmin(AdminJoinRequest request);
 
-    List<AdminSearchResponse> getAdmins(PageRequest pageRequest);
+    AdminGetsResponse getAdmins(PageRequest pageRequest);
 
     boolean duplicateIdCheck(String id);
 

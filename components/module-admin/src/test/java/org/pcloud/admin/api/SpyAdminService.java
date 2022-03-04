@@ -4,6 +4,7 @@ import org.aspectj.lang.JoinPoint;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
@@ -14,7 +15,7 @@ import java.util.List;
 public class SpyAdminService implements AdminService {
     public Admin joinAdmin_returnValue;
     public AdminJoinRequest joinAdmin_argumentRequest;
-    public List<AdminSearchResponse> getAdmins_returnValue;
+    public AdminGetsResponse getAdmins_returnValue;
     public PageRequest getAdmins_argumentRequest;
     public String duplicateIdCheck_argumentId;
     public boolean duplicateIdCheck_returnValue;
@@ -29,7 +30,7 @@ public class SpyAdminService implements AdminService {
     }
 
     @Override
-    public List<AdminSearchResponse> getAdmins(PageRequest pageRequest) {
+    public AdminGetsResponse getAdmins(PageRequest pageRequest) {
         this.getAdmins_argumentRequest = pageRequest;
         return getAdmins_returnValue;
     }

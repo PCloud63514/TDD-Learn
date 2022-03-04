@@ -4,7 +4,6 @@ import org.pcloud.support.token.jwt.JwtToken;
 import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;
 import org.pcloud.support.token.jwt.JwtTokenInformation;
 import org.pcloud.support.token.jwt.JwtTokenProvider;
-import org.springframework.data.auditing.DateTimeProvider;
 
 public class StubTokenProvider extends JwtTokenProvider {
     public JwtToken generate_returnValue;

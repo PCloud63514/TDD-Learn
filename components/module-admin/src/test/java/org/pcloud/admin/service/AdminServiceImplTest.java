@@ -3,6 +3,7 @@ package org.pcloud.admin.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.provider.StubLocalDateTimeProvider;
 import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
@@ -66,13 +67,14 @@ class AdminServiceImplTest {
         int givenPageSize = 10;
         PageRequest givenPageRequest = PageRequest.of(givenOffset, givenPageSize);
         spyAdminRepository.findAll_returnValue = List.of(Admin.create("id1", "password2", "ADMIN", "Default", stubLocalDateTimeProvider.now()));
-        List<AdminSearchResponse> admins = adminService.getAdmins(givenPageRequest);
+        AdminGetsResponse admins = adminService.getAdmins(givenPageRequest);
 
-        assertThat(admins).isNotEmpty();
-        assertThat(admins.get(0).getId()).isEqualTo("id1");
-        assertThat(admins.get(0).getRole()).isEqualTo("ADMIN");
-        assertThat(admins.get(0).getStatus()).isEqualTo("Default");
-        assertThat(admins.get(0).getCreateAt()).isEqualTo(stubLocalDateTimeProvider.now());
+        assertThat(admins.getList()).isNotEmpty();
+        assertThat(admins.getTotal()).isEqualTo(1);
+        assertThat(admins.getList().get(0).getId()).isEqualTo("id1");
+        assertThat(admins.getList().get(0).getRole()).isEqualTo("ADMIN");
+        assertThat(admins.getList().get(0).getStatus()).isEqualTo("Default");
+        assertThat(admins.getList().get(0).getCreateAt()).isEqualTo(stubLocalDateTimeProvider.now());
     }
 
     @Test

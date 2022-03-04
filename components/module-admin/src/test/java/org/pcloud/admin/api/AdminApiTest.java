@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -84,28 +85,31 @@ class AdminApiTest {
 
     @Test
     void getAdmins_returnAdmins() throws Exception {
-        spyAdminService.getAdmins_returnValue = List.of(new AdminSearchResponse("id", "ADMIN",
-                "Default", true, LocalDateTime.of(2022, 2, 22, 20, 20, 20)));
+        int givenTotal = 1;
+        List<AdminSearchResponse> givenAdminSearchResponses = List.of(new AdminSearchResponse("id", "ADMIN", "Default", true, LocalDateTime.of(2022, 2, 22, 20, 20, 20)));
+        spyAdminService.getAdmins_returnValue = new AdminGetsResponse(givenTotal, givenAdminSearchResponses);
 
         mockMvc.perform(get("/admin"))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id", equalTo("id")))
-                .andExpect(jsonPath("$[0].role", equalTo("ADMIN")))
-                .andExpect(jsonPath("$[0].status", equalTo("Default")))
-                .andExpect(jsonPath("$[0].needChangePassword", equalTo(true)))
-                .andExpect(jsonPath("$[0].createAt", equalTo("2022-02-22 20:20:20")))
+                .andExpect(jsonPath("$.total", equalTo(givenTotal)))
+                .andExpect(jsonPath("$.list").isArray())
+                .andExpect(jsonPath("$.list[0].id", equalTo("id")))
+                .andExpect(jsonPath("$.list[0].role", equalTo("ADMIN")))
+                .andExpect(jsonPath("$.list[0].status", equalTo("Default")))
+                .andExpect(jsonPath("$.list[0].needChangePassword", equalTo(true)))
+                .andExpect(jsonPath("$.list[0].createAt", equalTo("2022-02-22 20:20:20")))
                 .andDo(print());
     }
 
     @Test
     void getAdmins_returnAdminsZero() throws Exception {
-        spyAdminService.getAdmins_returnValue = List.of();
+        int givenTotal = 0;
+        spyAdminService.getAdmins_returnValue = new AdminGetsResponse(givenTotal, List.of());
 
         mockMvc.perform(get("/admin")
                         .param("offset", "0")
                         .param("size", "1"))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.total", equalTo(givenTotal)))
+                .andExpect(jsonPath("$.list").isArray());
     }
 
     @Test
