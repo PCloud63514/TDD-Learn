@@ -3,13 +3,12 @@ package org.pcloud.admin.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pcloud.admin.data.response.AdminGetsResponse;
-import org.pcloud.admin.provider.StubLocalDateTimeProvider;
-import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminSearchResponse;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
+import org.pcloud.admin.provider.StubInitializedPasswordProvider;
+import org.pcloud.admin.provider.StubLocalDateTimeProvider;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
@@ -141,7 +140,7 @@ class AdminServiceImplTest {
         String givenId = "id";
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
         spyAdminRepository.findById_returnValue = Optional.of(Admin.builder()
-                .id("id")
+                .id(givenId)
                 .password("password")
                 .role("ADMIN")
                 .status("Default")

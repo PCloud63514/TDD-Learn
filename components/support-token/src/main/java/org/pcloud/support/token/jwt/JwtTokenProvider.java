@@ -8,17 +8,18 @@ import org.pcloud.support.token.core.DateProvider;
 import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.core.TokenProvider;
 import org.pcloud.support.token.core.UuidProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
 
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerateRequest, JwtTokenInformation<Token>> {
     private final DateProvider dateProvider;
     private final UuidProvider uuidProvider;
-    private final String secretKey;
+    @Value("${module.jwt.secret-key}")
+    private String secretKey;
 
     @Override
     public JwtToken generate(JwtTokenGenerateRequest request) {

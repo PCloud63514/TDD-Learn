@@ -3,7 +3,6 @@ package org.pcloud.admin.service;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;
 import org.springframework.data.domain.*;
-import org.springframework.data.repository.query.FluentQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,8 +162,4 @@ public class SpyAdminRepository implements AdminRepository {
         return false;
     }
 
-    @Override
-    public <S extends Admin, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
-        return null;
-    }
 }

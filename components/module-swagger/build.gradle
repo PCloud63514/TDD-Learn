@@ -1,0 +1,10 @@
+dependencies {
+    //swagger
+    implementation (group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2') {
+        exclude group: 'io.swagger',module: 'swagger-annotations'
+        exclude group: 'io.swagger',module: 'swagger-models'
+    }
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation "io.swagger:swagger-annotations:1.6.2"
+    implementation "io.swagger:swagger-models:1.6.2"
+}
