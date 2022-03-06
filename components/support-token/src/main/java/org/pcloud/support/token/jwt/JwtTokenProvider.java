@@ -3,23 +3,26 @@ package org.pcloud.support.token.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
 import org.pcloud.support.token.core.DateProvider;
-import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.core.TokenProvider;
+import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.core.UuidProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@RequiredArgsConstructor
 @Component
 public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerateRequest, JwtTokenInformation<Token>> {
     private final DateProvider dateProvider;
     private final UuidProvider uuidProvider;
-    @Value("${module.jwt.secret-key}")
-    private String secretKey;
+    private final String secretKey;
+
+    public JwtTokenProvider(DateProvider dateProvider, UuidProvider uuidProvider, @Value("${module.jwt.secret-key}") String secretKey) {
+        this.dateProvider = dateProvider;
+        this.uuidProvider = uuidProvider;
+        this.secretKey = secretKey;
+    }
 
     @Override
     public JwtToken generate(JwtTokenGenerateRequest request) {
