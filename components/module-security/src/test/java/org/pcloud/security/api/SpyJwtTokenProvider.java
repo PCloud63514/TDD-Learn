@@ -9,6 +9,9 @@ import org.pcloud.support.token.jwt.JwtTokenInformation;
 import org.pcloud.support.token.jwt.JwtTokenProvider;
 
 public class SpyJwtTokenProvider extends JwtTokenProvider {
+    public JwtTokenGenerateRequest generate_argumentRequest;
+    public JwtToken generate_returnValue;
+
     public SpyJwtTokenProvider() {
         super(null, null, null);
     }
@@ -19,11 +22,12 @@ public class SpyJwtTokenProvider extends JwtTokenProvider {
 
     @Override
     public JwtToken generate(JwtTokenGenerateRequest request) {
-        return super.generate(request);
+        generate_argumentRequest = request;
+        return generate_returnValue;
     }
 
     @Override
     public JwtTokenInformation<Token> getInformation(String token) {
-        return super.getInformation(token);
+        return null;
     }
 }
