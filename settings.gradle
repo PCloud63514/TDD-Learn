@@ -4,6 +4,5 @@ include ':applications:app-smartpass'
 include ':components:module-admin'
 include ':components:module-gateway'
 include ':components:module-swagger'
-include ':components:support-environment'
 
 include ':components:module-security', ':components:support-token'
