@@ -4,13 +4,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.provider.StubLocalDateTimeProvider;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +25,15 @@ class AdminServiceImplTest {
     StubLocalDateTimeProvider stubLocalDateTimeProvider;
     StubInitializedPasswordProvider stubInitializedPasswordProvider;
     SpyAdminRepository spyAdminRepository;
+    SpyAuthClient spyAuthClient;
 
     @BeforeEach
     void setUp() {
+        spyAuthClient = new SpyAuthClient();
         spyAdminRepository = new SpyAdminRepository();
         stubLocalDateTimeProvider = new StubLocalDateTimeProvider();
         stubInitializedPasswordProvider = new StubInitializedPasswordProvider();
-        adminService = new AdminServiceImpl(stubLocalDateTimeProvider, stubInitializedPasswordProvider, spyAdminRepository);
+        adminService = new AdminServiceImpl(stubLocalDateTimeProvider, stubInitializedPasswordProvider, spyAdminRepository, spyAuthClient);
     }
 
     @Test
@@ -162,5 +167,33 @@ class AdminServiceImplTest {
         Assertions.assertThrows(RuntimeException.class, () -> {
             adminService.passwordInit(givenRequest);
         });
+    }
+
+    @Test
+    void login_passesIdAndPasswordToAdminRepository_findAdminIdAndPassword() {
+        String givenId = "id";
+        String givenPassword = "password";
+        AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
+        HttpServletResponse givenResponse = new MockHttpServletResponse();
+
+        adminService.login(givenRequest, givenResponse);
+
+        assertThat(spyAdminRepository.findAdminByIdAndPassword_argumentId).isEqualTo(givenId);
+        assertThat(spyAdminRepository.findAdminByIdAndPassword_argumentPassword).isEqualTo(givenPassword);
+    }
+
+    @Test
+    void login_passesTokenIssueRequestToAuthClient_issueToken() {
+        String givenId = "id";
+        String givenPassword = "password";
+        String givenRole = "role";
+        AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
+        HttpServletResponse givenResponse = new MockHttpServletResponse();
+        Admin givenAdmin = Admin.create(givenId, givenPassword, givenRole, null, null);
+        spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.of(givenAdmin);
+
+        adminService.login(givenRequest, givenResponse);
+
+        assertThat(spyAuthClient.issueToken_argumentRequest.getRole()).isEqualTo(givenRole);
     }
 }

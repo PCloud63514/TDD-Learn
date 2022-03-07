@@ -16,7 +16,10 @@ public class SpyAdminRepository implements AdminRepository {
     public String existsById_argumentId;
     public boolean existsById_returnValue;
     public String findById_argumentId;
-    public Optional<Admin> findById_returnValue;
+    public Optional<Admin> findById_returnValue = Optional.empty();
+    public String findAdminByIdAndPassword_argumentId;
+    public String findAdminByIdAndPassword_argumentPassword;
+    public Optional<Admin> findAdminByIdAndPassword_returnValue = Optional.empty();
 
     @Override
     public List<Admin> findAll() {
@@ -162,4 +165,10 @@ public class SpyAdminRepository implements AdminRepository {
         return false;
     }
 
+    @Override
+    public Optional<Admin> findAdminByIdAndPassword(String id, String password) {
+        this.findAdminByIdAndPassword_argumentId = id;
+        this.findAdminByIdAndPassword_argumentPassword = password;
+        return findAdminByIdAndPassword_returnValue;
+    }
 }
