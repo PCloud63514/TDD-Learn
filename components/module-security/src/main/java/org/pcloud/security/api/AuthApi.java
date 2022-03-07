@@ -17,7 +17,6 @@ public class AuthApi {
     public Token issueToken(@RequestBody TokenIssueRequest request) {
         return this.authService.generateToken(request);
     }
-    // 토큰 발급
     // 토큰 연장
     // 토큰 폐기
     // 토큰 관련 정보 조회?
