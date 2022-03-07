@@ -27,19 +27,22 @@ class JwtTokenProviderTest {
 
     @Test
     void generate_returnValue() {
+        String givenTokenProviderDomain = "domain";
         String givenRole = "role";
         long givenValidityMS = 10000;
         long givenRefreshValidityMS = 100000;
-        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenRole, givenValidityMS, givenRefreshValidityMS);
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenTokenProviderDomain, givenRole, givenValidityMS, givenRefreshValidityMS);
         stubDateProvider.now_returnValue = new Date();
         stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
         Date date = stubDateProvider.now();
         String requestId = stubUuidProvider.randomUUID().toString();
 
         Claims tokenClaims = Jwts.claims().setSubject(requestId);
+        tokenClaims.put("tokenProviderDomain", givenTokenProviderDomain);
         tokenClaims.put("role", givenRole);
         tokenClaims.put("validity", givenValidityMS);
         Claims refreshClaims = Jwts.claims().setSubject(requestId);
+        refreshClaims.put("tokenProviderDomain", givenTokenProviderDomain);
         refreshClaims.put("role", givenRole);
         refreshClaims.put("validity", givenRefreshValidityMS);
 
@@ -65,10 +68,11 @@ class JwtTokenProviderTest {
 
     @Test
     void getInformation_returnValue() {
+        String givenTokenProviderDomain = "domain";
         String givenRole = "role";
         long givenValidityMS = 10000;
         long givenRefreshValidityMS = 100000;
-        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenRole, givenValidityMS, givenRefreshValidityMS);
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenTokenProviderDomain, givenRole, givenValidityMS, givenRefreshValidityMS);
         stubDateProvider.now_returnValue = new Date();
         stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
 

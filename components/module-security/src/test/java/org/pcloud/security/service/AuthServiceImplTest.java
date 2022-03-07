@@ -47,11 +47,12 @@ class AuthServiceImplTest {
 
     @Test
     void generateToken_returnValue() {
+        String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenRole, givenData, givenValidity, givenRefreshValidity);
+        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
 
         Token token = authService.generateToken(givenRequest);
@@ -61,15 +62,17 @@ class AuthServiceImplTest {
 
     @Test
     void generateToken_passesJwtTokenGenerateRequestToJwtTokenProvider() {
+        String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenRole, givenData, givenValidity, givenRefreshValidity);
+        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
 
         authService.generateToken(givenRequest);
 
+        assertThat(spyJwtTokenProvider.generate_argumentRequest.getTokenProviderDomain()).isEqualTo(givenIssueRequestDomain);
         assertThat(spyJwtTokenProvider.generate_argumentRequest.getRole()).isEqualTo(givenRole);
         assertThat(spyJwtTokenProvider.generate_argumentRequest.getValidityMS()).isEqualTo(givenValidity);
         assertThat(spyJwtTokenProvider.generate_argumentRequest.getRefreshValidityMS()).isEqualTo(givenRefreshValidity);
@@ -77,6 +80,7 @@ class AuthServiceImplTest {
 
     @Test
     void generateToken_passesDataToOpsForHashInPutAll() {
+        String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         givenData.put("userId", 1);
@@ -85,7 +89,7 @@ class AuthServiceImplTest {
         String givenToken = "token2";
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenRole, givenData, givenValidity, givenRefreshValidity);
+        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken(givenToken, "refresh");
 
         authService.generateToken(givenRequest);

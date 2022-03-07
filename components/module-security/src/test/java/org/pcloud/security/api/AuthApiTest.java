@@ -33,12 +33,13 @@ class AuthApiTest {
 
     @Test
     void issueToken_createdHttpStatus() throws Exception {
+        String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
 
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenRole, givenData, givenValidity, givenRefreshValidity);
+        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
 
         mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,6 +62,7 @@ class AuthApiTest {
 
     @Test
     void issueToken_passesTokenIssueRequestToAuthService() throws Exception {
+        String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         givenData.put("userId", 1);
@@ -70,7 +72,7 @@ class AuthApiTest {
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
 
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenRole, givenData, givenValidity, givenRefreshValidity);
+        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
 
         mockMvc.perform(post("/auth")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -11,12 +11,14 @@ import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;
 import org.pcloud.security.data.request.TokenIssueRequest;
+import org.pcloud.security.data.response.TokenResponse;
 import org.pcloud.security.network.AuthClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin joinAdmin(AdminJoinRequest request) {
+        adminRepository.findById(request.getId()).ifPresent(admin -> {
+            throw new RuntimeException();
+        });
         Admin admin = Admin.create(request.getId(), request.getPassword(), "ADMIN", "Default", localDateTimeProvider.now());
         return adminRepository.save(admin);
     }
@@ -62,9 +67,10 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void login(AdminLoginRequest request, HttpServletResponse response) {
-        adminRepository.findAdminByIdAndPassword(request.getId(), request.getPassword()).ifPresent(admin -> {
-            TokenIssueRequest tokenIssueRequest = new TokenIssueRequest(admin.getRole(), null, 0, 0);
-            authClient.issueToken(tokenIssueRequest);
-        });
+        Admin admin = adminRepository.findAdminByIdAndPassword(request.getId(), request.getPassword())
+                .orElseThrow(RuntimeException::new);
+        TokenIssueRequest tokenIssueRequest = new TokenIssueRequest("admin", admin.getRole(), new HashMap<>(), 60000, 600000);
+        TokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
+        response.addHeader("token", tokenResponse.getToken());
     }
 }

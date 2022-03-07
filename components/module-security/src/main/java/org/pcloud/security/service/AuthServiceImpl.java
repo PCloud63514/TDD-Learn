@@ -20,7 +20,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Token generateToken(TokenIssueRequest request) {
-        JwtTokenGenerateRequest jwtTokenGenerateRequest = new JwtTokenGenerateRequest(request.getRole(), request.getValidity(), request.getRefreshValidity());
+        JwtTokenGenerateRequest jwtTokenGenerateRequest = new JwtTokenGenerateRequest(request.getIssueRequestDomain(), request.getRole(), request.getValidity(), request.getRefreshValidity());
         JwtToken generateToken = jwtTokenProvider.generate(jwtTokenGenerateRequest);
 
         HashOperations<String, Object, Object> operations = redisTemplate.opsForHash();

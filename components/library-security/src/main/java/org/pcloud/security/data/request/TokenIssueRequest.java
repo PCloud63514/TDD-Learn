@@ -10,6 +10,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Getter
 public class TokenIssueRequest {
+    private String issueRequestDomain;
     private String role;
     private Map<String, Object> data;
     private long validity;
