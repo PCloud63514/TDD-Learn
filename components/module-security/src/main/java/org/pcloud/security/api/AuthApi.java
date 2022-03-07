@@ -1,6 +1,7 @@
 package org.pcloud.security.api;
 
 import lombok.RequiredArgsConstructor;
+import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.security.service.AuthService;
 import org.pcloud.support.token.core.Token;
 import org.springframework.http.HttpStatus;

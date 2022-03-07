@@ -1,0 +1,3 @@
+feign-client:
+  auth:
+    url: localhost:8080/auth

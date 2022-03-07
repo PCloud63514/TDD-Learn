@@ -1,9 +1,9 @@
 package org.pcloud.security.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.core.Token;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;

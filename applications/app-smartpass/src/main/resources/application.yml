@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8180
   servlet:
     encoding:
       charset: UTF-8
@@ -28,3 +28,8 @@ spring:
 module:
   jwt:
     secret-key: secretKey
+
+
+feign-client:
+  auth:
+    url: http://localhost:8080/auth

@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+spring:
+  profiles:
+    active: local
+  cache:
+    redis
+  redis:
+    host: localhost
+    port: 6379
+module:
+  jwt:
+    secret-key: secretKey
+
+feign-client:
+  auth:
+    url: localhost:8080/auth

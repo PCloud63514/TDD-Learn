@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.data.response.AdminGetsResponse;
@@ -205,11 +206,15 @@ class AdminApiTest {
 
     @Test
     void login_passesLoginRequestToService() throws Exception {
+        String givenId = "id";
+        String givenPassword = "password";
+        AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
         mockMvc.perform(post("/admin/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":\"id\", \"password\":\"password\"}"));
+                .content(objectMapper.writeValueAsString(givenRequest)));
 
         assertThat(spyAdminService.login_argumentRequest.getId()).isEqualTo("id");
         assertThat(spyAdminService.login_argumentRequest.getPassword()).isEqualTo("password");
+        assertThat(spyAdminService.login_argumentHttpServletResponse).isNotNull();
     }
 }

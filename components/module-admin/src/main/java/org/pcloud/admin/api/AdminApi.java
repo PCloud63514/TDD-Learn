@@ -7,10 +7,16 @@ import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
 import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
+import org.pcloud.security.data.request.TokenIssueRequest;
+import org.pcloud.security.data.response.TokenResponse;
+import org.pcloud.security.network.AuthClient;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 @Validated
 @RequiredArgsConstructor
@@ -42,7 +48,7 @@ public class AdminApi {
     }
 
     @PostMapping("login")
-    public void login(@RequestBody AdminLoginRequest request) {
-        adminService.login(request);
+    public void login(@RequestBody AdminLoginRequest request, HttpServletResponse response) {
+        adminService.login(request, response);
     }
 }

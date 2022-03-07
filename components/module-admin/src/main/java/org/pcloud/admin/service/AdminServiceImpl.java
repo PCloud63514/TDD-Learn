@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void login(AdminLoginRequest request) {
+    public void login(AdminLoginRequest request, HttpServletResponse response) {
 
     }
 }

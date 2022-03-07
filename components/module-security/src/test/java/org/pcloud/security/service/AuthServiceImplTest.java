@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pcloud.security.api.SpyJwtTokenProvider;
-import org.pcloud.security.api.TokenIssueRequest;
+import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.jwt.JwtToken;
 import org.springframework.data.redis.connection.RedisConnection;

@@ -1,7 +1,7 @@
 package org.pcloud.security.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pcloud.security.api.TokenIssueRequest;
+import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.jwt.JwtToken;
 import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;

@@ -8,6 +8,8 @@ import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
 import org.springframework.data.domain.PageRequest;
 
+import javax.servlet.http.HttpServletResponse;
+
 public class SpyAdminService implements AdminService {
     public Admin joinAdmin_returnValue;
     public AdminJoinRequest joinAdmin_argumentRequest;
@@ -18,6 +20,7 @@ public class SpyAdminService implements AdminService {
     public AdminPasswordInitialRequest passwordInit_argumentRequest;
     public Admin passwordInit_returnValue;
     public AdminLoginRequest login_argumentRequest;
+    public HttpServletResponse login_argumentHttpServletResponse;
 
     @Override
     public Admin joinAdmin(AdminJoinRequest request) {
@@ -44,7 +47,8 @@ public class SpyAdminService implements AdminService {
     }
 
     @Override
-    public void login(AdminLoginRequest request) {
+    public void login(AdminLoginRequest request, HttpServletResponse response) {
         this.login_argumentRequest = request;
+        this.login_argumentHttpServletResponse = response;
     }
 }

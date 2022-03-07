@@ -1,4 +1,4 @@
-package org.pcloud.security.api;
+package org.pcloud.security.data.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

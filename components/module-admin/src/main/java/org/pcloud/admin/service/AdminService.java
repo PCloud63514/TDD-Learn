@@ -7,6 +7,8 @@ import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.springframework.data.domain.PageRequest;
 
+import javax.servlet.http.HttpServletResponse;
+
 public interface AdminService {
     Admin joinAdmin(AdminJoinRequest request);
 
@@ -16,5 +18,5 @@ public interface AdminService {
 
     Admin passwordInit(AdminPasswordInitialRequest request);
 
-    void login(AdminLoginRequest request);
+    void login(AdminLoginRequest request, HttpServletResponse response);
 }

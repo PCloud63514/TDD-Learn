@@ -1,0 +1,12 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.apache.httpcomponents:httpclient'
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
+    // feign 사용에 필요한 보조 의존성은 아래의 링크에서 찾아서 추가하면 된다.
+    // https://mvnrepository.com/artifact/io.github.openfeign
+    implementation 'io.github.openfeign:feign-okhttp'
+    implementation 'io.github.openfeign:feign-jackson'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

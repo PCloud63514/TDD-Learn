@@ -1,4 +1,5 @@
 dependencies {
+    implementation project(':components:library-security')
     implementation project(':components:support-token')
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
