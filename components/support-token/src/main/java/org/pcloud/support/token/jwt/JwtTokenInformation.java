@@ -9,13 +9,9 @@ import java.util.Date;
 @Getter
 public class JwtTokenInformation<T extends Token> extends TokenInformation<T> {
     private final String subject;
-    private final String tokenProviderDomain;
-    private final String role;
 
-    public JwtTokenInformation(String tokenProviderDomain, T token, String subject, String role, long validityMS, Date issuedAt) {
-        super(token, validityMS, issuedAt);
-        this.tokenProviderDomain = tokenProviderDomain;
+    public JwtTokenInformation(T token, String subject, Date issuedAt) {
+        super(token, issuedAt);
         this.subject = subject;
-        this.role = role;
     }
 }

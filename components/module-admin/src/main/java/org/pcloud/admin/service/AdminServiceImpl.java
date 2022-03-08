@@ -69,7 +69,10 @@ public class AdminServiceImpl implements AdminService {
     public void login(AdminLoginRequest request, HttpServletResponse response) {
         Admin admin = adminRepository.findAdminByIdAndPassword(request.getId(), request.getPassword())
                 .orElseThrow(RuntimeException::new);
-        TokenIssueRequest tokenIssueRequest = new TokenIssueRequest("admin", admin.getRole(), new HashMap<>(), 60000, 600000);
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("role", admin.getRole());
+        data.put("id", admin.getId());
+        TokenIssueRequest tokenIssueRequest = new TokenIssueRequest("admin", admin.getRole(), data, 60000, 600000);
         TokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
         response.addHeader("token", tokenResponse.getToken());
     }

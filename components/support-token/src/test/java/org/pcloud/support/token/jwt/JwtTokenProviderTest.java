@@ -27,24 +27,16 @@ class JwtTokenProviderTest {
 
     @Test
     void generate_returnValue() {
-        String givenTokenProviderDomain = "domain";
-        String givenRole = "role";
         long givenValidityMS = 10000;
         long givenRefreshValidityMS = 100000;
-        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenTokenProviderDomain, givenRole, givenValidityMS, givenRefreshValidityMS);
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenValidityMS, givenRefreshValidityMS);
         stubDateProvider.now_returnValue = new Date();
         stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
         Date date = stubDateProvider.now();
         String requestId = stubUuidProvider.randomUUID().toString();
 
         Claims tokenClaims = Jwts.claims().setSubject(requestId);
-        tokenClaims.put("tokenProviderDomain", givenTokenProviderDomain);
-        tokenClaims.put("role", givenRole);
-        tokenClaims.put("validity", givenValidityMS);
         Claims refreshClaims = Jwts.claims().setSubject(requestId);
-        refreshClaims.put("tokenProviderDomain", givenTokenProviderDomain);
-        refreshClaims.put("role", givenRole);
-        refreshClaims.put("validity", givenRefreshValidityMS);
 
         String givenToken = Jwts.builder()
                 .setClaims(tokenClaims)
@@ -68,11 +60,9 @@ class JwtTokenProviderTest {
 
     @Test
     void getInformation_returnValue() {
-        String givenTokenProviderDomain = "domain";
-        String givenRole = "role";
         long givenValidityMS = 10000;
         long givenRefreshValidityMS = 100000;
-        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenTokenProviderDomain, givenRole, givenValidityMS, givenRefreshValidityMS);
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenValidityMS, givenRefreshValidityMS);
         stubDateProvider.now_returnValue = new Date();
         stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
 
@@ -81,13 +71,9 @@ class JwtTokenProviderTest {
         JwtTokenInformation<Token> refreshInformation = jwtTokenProvider.getInformation(jwtToken.getRefresh());
 
         assertThat(tokenInformation.token()).isEqualTo(jwtToken.getToken());
-        assertThat(tokenInformation.getValidityMS()).isEqualTo(givenValidityMS);
-        assertThat(tokenInformation.getRole()).isEqualTo(givenRole);
         assertThat(tokenInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(stubDateProvider.now().toInstant().getEpochSecond());
 
         assertThat(refreshInformation.token()).isEqualTo(jwtToken.getRefresh());
-        assertThat(refreshInformation.getValidityMS()).isEqualTo(givenRefreshValidityMS);
-        assertThat(refreshInformation.getRole()).isEqualTo(givenRole);
         assertThat(refreshInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(stubDateProvider.now().toInstant().getEpochSecond());
     }
 }

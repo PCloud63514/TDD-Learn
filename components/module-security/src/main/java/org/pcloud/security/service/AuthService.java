@@ -1,10 +1,10 @@
 package org.pcloud.security.service;
 
 import org.pcloud.security.data.request.TokenIssueRequest;
-import org.pcloud.support.token.core.Token;
+import org.pcloud.support.token.jwt.JwtToken;
 
 public interface AuthService {
-    Token generateToken(TokenIssueRequest request);
+    JwtToken generateToken(TokenIssueRequest request);
 
     void deleteToken(String token);
 

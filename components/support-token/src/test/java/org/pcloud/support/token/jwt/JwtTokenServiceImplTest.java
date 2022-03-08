@@ -28,11 +28,9 @@ class JwtTokenServiceImplTest {
 
     @Test
     void generateToken_returnValue() throws Exception {
-        String tokenProviderDomain = "domain";
-        String givenRole = "role";
         long givenValidityMS = 10000;
         long givenRefreshValidityMS = 100000;
-        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(tokenProviderDomain, givenRole, givenValidityMS, givenRefreshValidityMS);
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenValidityMS, givenRefreshValidityMS);
         stubTokenProvider.generate_returnValue = new JwtToken("token", "refresh");
 
         JwtToken token = jwtTokenService.generateToken(givenRequest);
@@ -43,12 +41,10 @@ class JwtTokenServiceImplTest {
 
     @Test
     void generateTokenHttpServletResponse_returnValue() throws Exception {
-        String tokenProviderDomain = "domain";
-        String givenRole = "role";
         long givenValidityMS = 10000;
         long givenRefreshValidityMS = 100000;
         HttpServletResponse givenHttpServletResponse = new MockHttpServletResponse();
-        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(tokenProviderDomain, givenRole, givenValidityMS, givenRefreshValidityMS);
+        JwtTokenGenerateRequest givenRequest = new JwtTokenGenerateRequest(givenValidityMS, givenRefreshValidityMS);
         stubTokenProvider.generate_returnValue = new JwtToken("token", "refresh");
 
         JwtToken token = jwtTokenService.generateToken(givenRequest, givenHttpServletResponse);
@@ -61,21 +57,16 @@ class JwtTokenServiceImplTest {
 
     @Test
     void getTokenInformation_returnValue() {
-        String tokenProviderDoamin = "domain";
         String givenToken = "token";
         String givenSubject = "subject";
-        String givenRole = "role";
-        long givenValidityMS = 10000;
         Date givenDate = new Date();
 
-        stubTokenProvider.getInformation_returnValue = new JwtTokenInformation<Token>(tokenProviderDoamin, new Token(givenToken), givenSubject, givenRole, givenValidityMS, givenDate);
+        stubTokenProvider.getInformation_returnValue = new JwtTokenInformation<Token>(new Token(givenToken), givenSubject, givenDate);
         JwtTokenInformation<Token> tokenInformation = jwtTokenService.getTokenInformation(givenToken);
 
         assertThat(tokenInformation.token()).isEqualTo(givenToken);
-        assertThat(tokenInformation.getRole()).isEqualTo(givenRole);
         assertThat(tokenInformation.getSubject()).isEqualTo(givenSubject);
         assertThat(tokenInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(givenDate.toInstant().getEpochSecond());
-        assertThat(tokenInformation.getValidityMS()).isEqualTo(givenValidityMS);
     }
 
     @Test

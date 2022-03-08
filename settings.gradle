@@ -2,7 +2,8 @@ rootProject.name = 'SmartPass'
 
 include ':applications:app-smartpass'
 include ':components:module-admin'
-include ':components:module-gateway'
 include ':components:module-swagger'
 
 include ':components:module-security', ':components:library-security', ':components:support-token'
+
+include ':applications:app-gateway'

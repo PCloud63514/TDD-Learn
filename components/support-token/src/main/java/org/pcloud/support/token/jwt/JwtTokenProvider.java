@@ -29,17 +29,14 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
         String requestId = uuidProvider.randomUUID().toString();
         Date date = dateProvider.now();
 
-        String token = _generate(requestId, request.getTokenProviderDomain(), request.getRole(), date, request.getValidityMS());
-        String refresh = _generate(requestId, request.getTokenProviderDomain(), request.getRole(), date, request.getRefreshValidityMS());
+        String token = _generate(requestId, date, request.getValidityMS());
+        String refresh = _generate(requestId, date, request.getRefreshValidityMS());
 
         return new JwtToken(token, refresh);
     }
 
-    private String _generate(String requestId, String tokenProviderDomain, String role, Date date, long validityMS) {
+    private String _generate(String requestId, Date date, long validityMS) {
         Claims claims = Jwts.claims().setSubject(requestId);
-        claims.put("tokenProviderDomain", tokenProviderDomain);
-        claims.put("role", role);
-        claims.put("validity", validityMS);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -56,10 +53,6 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
                 .parseClaimsJws(token)
                 .getBody();
 
-        String tokenProviderDomain = body.get("tokenProviderDomain", String.class);
-        String role = body.get("role", String.class);
-        Long validity = body.get("validity", Long.class);
-
-        return new JwtTokenInformation<Token>(tokenProviderDomain, new Token(token), body.getSubject(), role, validity, body.getIssuedAt());
+        return new JwtTokenInformation<Token>(new Token(token), body.getSubject(), body.getIssuedAt());
     }
 }

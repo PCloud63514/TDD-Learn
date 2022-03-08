@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.core.Token;
+import org.pcloud.support.token.jwt.JwtToken;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -50,7 +51,8 @@ class AuthApiTest {
     @Test
     void issueToken_returnValue() throws Exception {
         String givenStrToken = "token2";
-        spyAuthService.generateToken_returnValue = new Token(givenStrToken);
+        String givenStrRefresh = "refresh2";
+        spyAuthService.generateToken_returnValue = new JwtToken(givenStrToken, givenStrRefresh);
 
         mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
