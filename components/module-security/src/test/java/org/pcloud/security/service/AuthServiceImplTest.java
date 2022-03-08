@@ -21,8 +21,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -37,10 +36,6 @@ class AuthServiceImplTest {
     HashOperations mockHashOperations;
     @Mock
     ValueOperations mockValueOperations;
-    @Mock
-    RedisConnection redisConnectionMock;
-    @Mock
-    RedisConnectionFactory redisConnectionFactoryMock;
 
     @BeforeEach
     void setUp() {
@@ -67,6 +62,22 @@ class AuthServiceImplTest {
 
         assertThat(spyJwtTokenProvider.generate_returnValue.getToken()).isEqualTo(jwtToken.getToken());
         assertThat(spyJwtTokenProvider.generate_returnValue.getRefresh()).isEqualTo(jwtToken.getRefresh());
+    }
+
+    @Test
+    void generateToken_passesJwtTokenGenerateRequestToJwtTokenProvider() {
+        String givenIssueRequestDomain = "domain";
+        String givenRole = "role";
+        Map<String, Object> givenData = new HashMap<>();
+        long givenValidity = 10000;
+        long givenRefreshValidity = 100000;
+        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
+        spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
+
+        authService.generateToken(givenRequest);
+
+        assertThat(spyJwtTokenProvider.generate_argumentRequest.getValidityMS()).isEqualTo(givenValidity);
+        assertThat(spyJwtTokenProvider.generate_argumentRequest.getRefreshValidityMS()).isEqualTo(givenRefreshValidity);
     }
 
     @Test
@@ -112,19 +123,22 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void generateToken_passesJwtTokenGenerateRequestToJwtTokenProvider() {
+    void generateToken_passesToExpireOfRedisTemplate() {
         String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
+        UUID givenUUID = UUID.randomUUID();
+        stubUuidProvider.randomUUID_returnValue = givenUUID;
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
+        doReturn(true).when(mockRedisTemplate).expire(anyString(), anyLong(), eq(TimeUnit.MILLISECONDS));
+        JwtToken jwtToken = authService.generateToken(givenRequest);
 
-        authService.generateToken(givenRequest);
-
-        assertThat(spyJwtTokenProvider.generate_argumentRequest.getValidityMS()).isEqualTo(givenValidity);
-        assertThat(spyJwtTokenProvider.generate_argumentRequest.getRefreshValidityMS()).isEqualTo(givenRefreshValidity);
+        verify(mockRedisTemplate).expire(eq(jwtToken.getToken()), eq(givenValidity), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(jwtToken.getRefresh()), eq(givenRefreshValidity), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(givenUUID.toString()), eq(givenRefreshValidity), eq(TimeUnit.MILLISECONDS));
     }
 
     @Test

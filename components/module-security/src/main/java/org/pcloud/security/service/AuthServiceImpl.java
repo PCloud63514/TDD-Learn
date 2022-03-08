@@ -2,12 +2,10 @@ package org.pcloud.security.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pcloud.security.data.request.TokenIssueRequest;
-import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.core.UuidProvider;
 import org.pcloud.support.token.jwt.JwtToken;
 import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;
 import org.pcloud.support.token.jwt.JwtTokenProvider;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;

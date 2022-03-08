@@ -11,4 +11,6 @@ public interface AuthService {
     // 토큰 연계 정보 조회
 
     // 토큰 연장
+
+    // 토큰 인증
 }
