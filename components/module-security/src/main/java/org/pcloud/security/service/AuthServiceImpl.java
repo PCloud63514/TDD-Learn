@@ -29,4 +29,9 @@ public class AuthServiceImpl implements AuthService {
 
         return new Token(generateToken.getToken());
     }
+
+    @Override
+    public void deleteToken(String token) {
+        redisTemplate.delete(token);
+    }
 }

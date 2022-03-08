@@ -33,7 +33,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Admin joinAdmin(AdminJoinRequest request) {
         adminRepository.findById(request.getId()).ifPresent(admin -> {
-            throw new RuntimeException();
+            throw new RuntimeException("중복된 아이디가 존재합니다.");
         });
         Admin admin = Admin.create(request.getId(), request.getPassword(), "ADMIN", "Default", localDateTimeProvider.now());
         return adminRepository.save(admin);

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -38,9 +39,6 @@ class AuthServiceImplTest {
 
     @BeforeEach
     void setUp() {
-//        doReturn(redisConnectionMock).when(redisConnectionFactoryMock).getConnection();
-//        doReturn(redisConnectionFactoryMock).when(mockRedisTemplate).getConnectionFactory();
-        doReturn(mockHashOperations).when(mockRedisTemplate).opsForHash();
         spyJwtTokenProvider = new SpyJwtTokenProvider();
         authService = new AuthServiceImpl(spyJwtTokenProvider, mockRedisTemplate);
     }
@@ -54,6 +52,7 @@ class AuthServiceImplTest {
         long givenRefreshValidity = 100000;
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
+        doReturn(mockHashOperations).when(mockRedisTemplate).opsForHash();
 
         Token token = authService.generateToken(givenRequest);
 
@@ -69,6 +68,7 @@ class AuthServiceImplTest {
         long givenRefreshValidity = 100000;
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
+        doReturn(mockHashOperations).when(mockRedisTemplate).opsForHash();
 
         authService.generateToken(givenRequest);
 
@@ -91,6 +91,7 @@ class AuthServiceImplTest {
         long givenRefreshValidity = 100000;
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
         spyJwtTokenProvider.generate_returnValue = new JwtToken(givenToken, "refresh");
+        doReturn(mockHashOperations).when(mockRedisTemplate).opsForHash();
 
         authService.generateToken(givenRequest);
 
@@ -98,5 +99,15 @@ class AuthServiceImplTest {
         verify(mockRedisTemplate.opsForHash()).putAll(eq(givenToken), eq(givenData));
 //        verify(mockRedisTemplate).expire(any(), any(), any());
 //        verify(mockRedisTemplate).expire(eq(givenToken), eq(givenRefreshValidity), eq(TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void deleteToken_passesTokenToRedisTemplate() {
+        String givenToken = "givenToken1";
+         doReturn(true).when(mockRedisTemplate).delete(anyString());
+
+         authService.deleteToken(givenToken);
+
+         verify(mockRedisTemplate).delete(eq(givenToken));
     }
 }

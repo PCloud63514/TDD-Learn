@@ -6,5 +6,3 @@ include ':components:module-gateway'
 include ':components:module-swagger'
 
 include ':components:module-security', ':components:library-security', ':components:support-token'
-
-include ':applications:app-gateway'

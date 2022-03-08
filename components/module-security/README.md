@@ -10,3 +10,7 @@ Jwt + redis를 사용하여 각 서비스 요청에 필요한 정보를
 * 토큰 연장 요청
 * 토큰 폐기
 * api요청 차단
+
+## 연계 모듈
+- support-token
+- library-security

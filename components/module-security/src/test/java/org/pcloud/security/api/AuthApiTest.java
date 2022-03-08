@@ -15,9 +15,9 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class AuthApiTest {
     MockMvc mockMvc;
@@ -82,5 +82,21 @@ class AuthApiTest {
         assertThat(spyAuthService.generateToken_argumentRequest.getData()).isEqualTo(givenData);
         assertThat(spyAuthService.generateToken_argumentRequest.getValidity()).isEqualTo(givenValidity);
         assertThat(spyAuthService.generateToken_argumentRequest.getRefreshValidity()).isEqualTo(givenRefreshValidity);
+    }
+
+    @Test
+    void breakToken_okHttpStatus() throws Exception {
+        mockMvc.perform(delete("/auth/{token}", "token"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void breakToken_passesTokenToAuthService() throws Exception {
+        String givenToken = "token";
+
+        mockMvc.perform(delete("/auth/{token}", givenToken))
+                .andExpect(status().isOk());
+
+        assertThat(spyAuthService.deleteToken_argumentToken).isEqualTo(givenToken);
     }
 }
