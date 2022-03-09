@@ -11,7 +11,8 @@ import org.pcloud.support.token.jwt.JwtTokenProvider;
 public class SpyJwtTokenProvider extends JwtTokenProvider {
     public JwtTokenGenerateRequest generate_argumentRequest;
     public JwtToken generate_returnValue;
-
+    public String getInformation_argumentToken;
+    public boolean getInformation_isRuntimeException = false;
     public SpyJwtTokenProvider() {
         super(null, null, null);
     }
@@ -28,6 +29,12 @@ public class SpyJwtTokenProvider extends JwtTokenProvider {
 
     @Override
     public JwtTokenInformation<Token> getInformation(String token) {
+        getInformation_argumentToken = token;
+
+        if (getInformation_isRuntimeException) {
+            throw new RuntimeException();
+        }
+
         return null;
     }
 }

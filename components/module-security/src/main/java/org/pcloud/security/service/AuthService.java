@@ -1,5 +1,6 @@
 package org.pcloud.security.service;
 
+import org.pcloud.security.data.AuthDataInformation;
 import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.jwt.JwtToken;
 
@@ -8,9 +9,7 @@ public interface AuthService {
 
     void deleteToken(String token);
 
-    // 토큰 연계 정보 조회
+    AuthDataInformation getAuthDataInformation(String token);
 
-    // 토큰 연장
-
-    // 토큰 인증
+    JwtToken reIssueToken(String token, String refresh);
 }
