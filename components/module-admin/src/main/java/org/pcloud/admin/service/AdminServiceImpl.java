@@ -11,6 +11,7 @@ import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;
 import org.pcloud.security.data.request.TokenIssueRequest;
+import org.pcloud.security.data.response.JwtTokenResponse;
 import org.pcloud.security.data.response.TokenResponse;
 import org.pcloud.security.network.AuthClient;
 import org.springframework.data.domain.Page;
@@ -70,10 +71,12 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepository.findAdminByIdAndPassword(request.getId(), request.getPassword())
                 .orElseThrow(RuntimeException::new);
         HashMap<String, Object> data = new HashMap<>();
-        data.put("role", admin.getRole());
         data.put("id", admin.getId());
         TokenIssueRequest tokenIssueRequest = new TokenIssueRequest("admin", admin.getRole(), data, 60000, 600000);
-        TokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
+
+        JwtTokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
+
         response.addHeader("token", tokenResponse.getToken());
+        response.addHeader("refresh", tokenResponse.getRefresh());
     }
 }

@@ -10,12 +10,14 @@ import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.provider.StubLocalDateTimeProvider;
+import org.pcloud.security.data.response.JwtTokenResponse;
 import org.pcloud.security.data.response.TokenResponse;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -191,7 +193,7 @@ class AdminServiceImplTest {
         HttpServletResponse givenResponse = new MockHttpServletResponse();
         Admin givenAdmin = Admin.create(givenId, givenPassword, "role", null, null);
         spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.of(givenAdmin);
-        spyAuthClient.issueToken_returnValue = new TokenResponse("token");
+        spyAuthClient.issueToken_returnValue = new JwtTokenResponse("token", "refresh");
 
         adminService.login(givenRequest, givenResponse);
 
@@ -208,12 +210,17 @@ class AdminServiceImplTest {
         HttpServletResponse givenResponse = new MockHttpServletResponse();
         Admin givenAdmin = Admin.create(givenId, givenPassword, givenRole, null, null);
         spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.of(givenAdmin);
-        spyAuthClient.issueToken_returnValue = new TokenResponse();
+        spyAuthClient.issueToken_returnValue = new JwtTokenResponse();
+        HashMap<String, Object> givenData = new HashMap<>();
+        givenData.put("id", givenId);
 
         adminService.login(givenRequest, givenResponse);
 
         assertThat(spyAuthClient.issueToken_argumentRequest.getIssueRequestDomain()).isEqualTo("admin");
         assertThat(spyAuthClient.issueToken_argumentRequest.getRole()).isEqualTo(givenRole);
+        assertThat(spyAuthClient.issueToken_argumentRequest.getData()).isEqualTo(givenData);
+        assertThat(spyAuthClient.issueToken_argumentRequest.getValidity()).isEqualTo(60000);
+        assertThat(spyAuthClient.issueToken_argumentRequest.getRefreshValidity()).isEqualTo(600000);
     }
 
     @Test
@@ -222,15 +229,17 @@ class AdminServiceImplTest {
         String givenPassword = "password";
         String givenRole = "role";
         String givenToken = "token";
+        String givenRefresh = "refresh";
         AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
         HttpServletResponse givenResponse = new MockHttpServletResponse();
         Admin givenAdmin = Admin.create(givenId, givenPassword, givenRole, null, null);
         spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.of(givenAdmin);
-        spyAuthClient.issueToken_returnValue = new TokenResponse(givenToken);
+        spyAuthClient.issueToken_returnValue = new JwtTokenResponse(givenToken, givenRefresh);
 
         adminService.login(givenRequest, givenResponse);
 
         assertThat(givenResponse.getHeader("token")).isEqualTo(givenToken);
+        assertThat(givenResponse.getHeader("refresh")).isEqualTo(givenRefresh);
     }
 
     @Test

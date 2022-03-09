@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.core.Token;
 import org.pcloud.support.token.jwt.JwtToken;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,8 +40,8 @@ class AuthApiTest {
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
-
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
+        spyAuthService.generateToken_returnValue = new JwtToken("token", "refresh");
 
         mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,9 +58,11 @@ class AuthApiTest {
         mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                .andExpect(jsonPath("$.token", equalTo(givenStrToken)));
+                .andExpect(jsonPath("$.token", equalTo(givenStrToken)))
+                .andExpect(jsonPath("$.refresh", equalTo(givenStrRefresh)));
 
         assertThat(spyAuthService.generateToken_returnValue.getToken()).isEqualTo(givenStrToken);
+        assertThat(spyAuthService.generateToken_returnValue.getRefresh()).isEqualTo(givenStrRefresh);
     }
 
     @Test
@@ -70,11 +73,10 @@ class AuthApiTest {
         givenData.put("userId", 1);
         givenData.put("userName", "PCloud");
         givenData.put("item", List.of("1번", "2번", "3번"));
-
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
-
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
+        spyAuthService.generateToken_returnValue = new JwtToken("token", "refresh");
 
         mockMvc.perform(post("/auth")
                 .contentType(MediaType.APPLICATION_JSON)
