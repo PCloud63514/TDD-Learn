@@ -3,6 +3,7 @@ package org.pcloud.support.token.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.support.token.core.StubDateProvider;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JwtTokenProviderTest {
     JwtTokenProvider jwtTokenProvider;
@@ -75,5 +77,42 @@ class JwtTokenProviderTest {
 
         assertThat(refreshInformation.token()).isEqualTo(jwtToken.getRefresh());
         assertThat(refreshInformation.getIssuedAt().toInstant().getEpochSecond()).isEqualTo(stubDateProvider.now().toInstant().getEpochSecond());
+    }
+
+    @Test
+    void isExpiration_returnValue() {
+        Date givenDate = new Date();
+        Claims tokenClaims = Jwts.claims().setSubject("expirationSubject");
+        String givenToken = Jwts.builder()
+                .setClaims(tokenClaims)
+                .setIssuedAt(givenDate)
+                .setExpiration(new Date(givenDate.getTime() + 100000))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
+        boolean isExpiration = jwtTokenProvider.isExpiration(givenToken);
+
+        assertThat(isExpiration).isFalse();
+    }
+
+    @Test
+    void isExpiration_notExpiredJwtExceptionAndReturnValueTrue() {
+        Date givenDate = new Date();
+        Claims tokenClaims = Jwts.claims().setSubject("expirationSubject");
+        String givenExpirationToken = Jwts.builder()
+                .setClaims(tokenClaims)
+                .setIssuedAt(givenDate)
+                .setExpiration(givenDate)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
+        boolean isExpiration = jwtTokenProvider.isExpiration(givenExpirationToken);
+
+        assertThat(isExpiration).isTrue();
+    }
+
+    @Test
+    void isExpiration_throwRuntimeException() {
+        assertThrows(RuntimeException.class, ()-> jwtTokenProvider.isExpiration("errorToken"));
     }
 }

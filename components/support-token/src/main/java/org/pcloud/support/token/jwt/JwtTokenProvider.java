@@ -1,8 +1,6 @@
 package org.pcloud.support.token.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.pcloud.support.token.core.DateProvider;
 import org.pcloud.support.token.core.TokenProvider;
 import org.pcloud.support.token.core.Token;
@@ -53,6 +51,19 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
                 .parseClaimsJws(token)
                 .getBody();
 
-        return new JwtTokenInformation<Token>(new Token(token), body.getSubject(), body.getIssuedAt());
+        return new JwtTokenInformation<>(new Token(token), body.getSubject(), body.getIssuedAt());
+    }
+
+    public boolean isExpiration(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException expiredJwtException) {
+            expiredJwtException.printStackTrace();
+            return true;
+        }
+        return false;
     }
 }
