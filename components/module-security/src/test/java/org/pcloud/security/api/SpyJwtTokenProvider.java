@@ -13,6 +13,9 @@ public class SpyJwtTokenProvider extends JwtTokenProvider {
     public JwtToken generate_returnValue;
     public String getInformation_argumentToken;
     public boolean getInformation_isRuntimeException = false;
+    public String isExpiration_argumentToken;
+    public boolean isExpiration_returnValue = false;
+
     public SpyJwtTokenProvider() {
         super(null, null, null);
     }
@@ -36,5 +39,11 @@ public class SpyJwtTokenProvider extends JwtTokenProvider {
         }
 
         return null;
+    }
+
+    @Override
+    public boolean isExpiration(String token) {
+        this.isExpiration_argumentToken = token;
+        return !token.equals("tokenNotExpiration") && isExpiration_returnValue;
     }
 }

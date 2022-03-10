@@ -1,11 +1,11 @@
 package org.pcloud.security.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pcloud.security.api.SpyJwtTokenProvider;
 import org.pcloud.security.data.AuthDataInformation;
@@ -22,7 +22,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -31,10 +33,9 @@ class AuthServiceImplTest {
     @Mock
     RedisTemplate<String, Object> mockRedisTemplate;
     AuthServiceImpl authService;
+    @Spy
     SpyJwtTokenProvider spyJwtTokenProvider;
     StubUuidProvider stubUuidProvider;
-    //    @Mock
-//    ObjectMapper mockObjectMapper;
     @Mock
     HashOperations<String, String, Object> mockHashOperations;
     @Mock
@@ -50,7 +51,6 @@ class AuthServiceImplTest {
         //Mockito.lenient() < Loose Stubbing  : 불필요한 Stubbing은 넘어간다.
         //                  < Strict Stubbing : 처리되지 않은 Stubbing은 에러처리한다.
         stubUuidProvider = new StubUuidProvider();
-        spyJwtTokenProvider = new SpyJwtTokenProvider();
         authService = new AuthServiceImpl(spyJwtTokenProvider, mockRedisTemplate, stubUuidProvider);
 
         Mockito.lenient().doReturn(mockHashOperations).when(mockRedisTemplate).opsForHash();
@@ -73,12 +73,13 @@ class AuthServiceImplTest {
     @Test
     void generateToken_returnValue() {
         TokenIssueRequest givenRequest = getOkTokenIssueRequest();
-        spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
+        doReturn(new JwtToken("token2", "refresh2")).when(spyJwtTokenProvider).generate(any());
 
         JwtToken jwtToken = authService.generateToken(givenRequest);
 
-        assertThat(spyJwtTokenProvider.generate_returnValue.getToken()).isEqualTo(jwtToken.getToken());
-        assertThat(spyJwtTokenProvider.generate_returnValue.getRefresh()).isEqualTo(jwtToken.getRefresh());
+        verify(spyJwtTokenProvider).generate(any());
+        assertThat(jwtToken.getToken()).isEqualTo("token2");
+        assertThat(jwtToken.getRefresh()).isEqualTo("refresh2");
     }
 
     @Test
@@ -158,10 +159,17 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void getAuthDataInformation_passesTokenToGetInformationOfJwtTokenProvider() {
+    void getAuthDataInformation_passesTokenToIsExpirationOfJwtTokenProvider() {
         authService.getAuthDataInformation(givenToken);
 
-        assertThat(spyJwtTokenProvider.getInformation_argumentToken).isEqualTo(givenToken);
+        verify(spyJwtTokenProvider).isExpiration(eq(givenToken));
+    }
+
+    @Test
+    void getAuthDataInformation_throwRuntimeExceptionToExpiredJwt() {
+        doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
+
+        assertThrows(RuntimeException.class, ()-> authService.getAuthDataInformation(givenToken));
     }
 
     @Test
@@ -173,7 +181,7 @@ class AuthServiceImplTest {
 
     @Test
     void getAuthDataInformation_RunTimeExceptionToGiveTokenAndGetAnNull() {
-        Assertions.assertThrows(RuntimeException.class, () ->
+        assertThrows(RuntimeException.class, () ->
                 authService.getAuthDataInformation(givenTokenNull));
     }
 
@@ -194,7 +202,7 @@ class AuthServiceImplTest {
     @Test
     void getAuthDataInformation_throwRuntimeExceptionToGiveRefreshAndGetAnNull() {
         doReturn(null).when(mockValueOperations).get(givenRefresh);
-        Assertions.assertThrows(RuntimeException.class, () ->
+        assertThrows(RuntimeException.class, () ->
                 authService.getAuthDataInformation(givenToken));
     }
 
@@ -202,7 +210,7 @@ class AuthServiceImplTest {
     void getAuthDataInformation_throwRunTimeExceptionToCompareTokenAndGetTokenOfOpsForValue() {
         AuthInformation givenAuthInformation = new AuthInformation(null, null, 0, 0, "failToken", "failRefresh", null);
         doReturn(givenAuthInformation).when(mockValueOperations).get(givenRefresh);
-        Assertions.assertThrows(RuntimeException.class, () ->
+        assertThrows(RuntimeException.class, () ->
                 authService.getAuthDataInformation(givenToken));
     }
 
@@ -211,5 +219,67 @@ class AuthServiceImplTest {
         authService.getAuthDataInformation(givenToken);
 
         verify(mockRedisTemplate.opsForHash()).entries(eq(givenAuthInformation.getSecretKey()));
+    }
+
+    @Test
+    void reIssueToken_returnValue() {
+        JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh);
+
+        assertThat(jwtToken.getToken()).isEqualTo(givenToken);
+        assertThat(jwtToken.getRefresh()).isEqualTo(givenRefresh);
+    }
+
+    @Test
+    void reIssueToken_passesRefreshToIsExpirationOfJwtTokenProvider() {
+        authService.reIssueToken(givenToken, givenRefresh);
+
+        verify(spyJwtTokenProvider).isExpiration(givenRefresh);
+    }
+
+    @Test
+    void reIssueToken_throwRuntimeExceptionToExpiredJwt() {
+        doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
+
+        assertThrows(RuntimeException.class, ()-> authService.reIssueToken(givenToken, givenRefresh));
+    }
+
+    @Test
+    void reIssueToken_passesRefreshToGetOfOpsForValue() {
+        authService.reIssueToken(givenToken, givenRefresh);
+
+        verify(mockRedisTemplate.opsForValue()).get(eq(givenRefresh));
+    }
+
+    @Test
+    void reIssueToken_throwRunTimeExceptionAndPassesRefreshToGetOfOpsForValue() {
+        assertThrows(RuntimeException.class, () -> {
+            authService.reIssueToken(givenToken, givenRefreshNull);
+        });
+        verify(mockRedisTemplate.opsForValue()).get(eq(givenRefreshNull));
+    }
+
+    @Test
+    void reIssueToken_throwRunTimeExceptionAndCompareTokenAndRefresh() {
+        assertThrows(RuntimeException.class, () -> {
+            authService.reIssueToken("testToken", givenRefresh);
+        });
+    }
+
+    @Test
+    void reIssueToken_passesNotExpirationTokenToIsExpirationOfJwtTokenProvider() {
+        String _givenToken = "tokenNotExpiration";
+        String _givenRefresh = "refreshNotExpiration";
+        AuthInformation _givenAuthInformation = new AuthInformation(null, null, 0, 0, _givenToken, _givenRefresh, null);
+        doReturn(_givenAuthInformation).when(mockValueOperations).get(_givenRefresh);
+
+        JwtToken jwtToken = authService.reIssueToken(_givenToken, _givenRefresh);
+
+        assertThat(jwtToken.getToken()).isEqualTo(_givenToken);
+        assertThat(jwtToken.getRefresh()).isEqualTo(_givenRefresh);
+    }
+
+    @Test
+    void reIssueToken_passesValidityToGenerateOfJwtTokenProvider() {
+
     }
 }
