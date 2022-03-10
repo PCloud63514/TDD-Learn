@@ -44,6 +44,9 @@ public class SpyJwtTokenProvider extends JwtTokenProvider {
     @Override
     public boolean isExpiration(String token) {
         this.isExpiration_argumentToken = token;
-        return !token.equals("tokenNotExpiration") && isExpiration_returnValue;
+        if (token.equals("tokenNotExpiration")) {
+            return true;
+        }
+        return isExpiration_returnValue;
     }
 }

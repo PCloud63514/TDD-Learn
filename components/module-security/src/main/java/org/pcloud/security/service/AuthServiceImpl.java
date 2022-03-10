@@ -86,12 +86,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // jwt 새로 발급
-
+        jwtTokenProvider.generate(new JwtTokenGenerateRequest(authInformation.getValidity(), authInformation.getRefreshValidity()));
         // 토큰 -> refresh
         // refresh -> authInformation 구조 다시 만듬 형태로 redis 등록
 
         // 이전 토큰 & refresh 폐기
         // 새로 넣은 데이터들 및 secretKey에 있던 데이터 시간 갱신
-        return new JwtToken("test", refresh);
+        return new JwtToken(token, refresh);
     }
 }

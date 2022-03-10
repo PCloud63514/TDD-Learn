@@ -12,6 +12,7 @@ import org.pcloud.security.data.AuthDataInformation;
 import org.pcloud.security.data.AuthInformation;
 import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.jwt.JwtToken;
+import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -280,6 +281,17 @@ class AuthServiceImplTest {
 
     @Test
     void reIssueToken_passesValidityToGenerateOfJwtTokenProvider() {
+        String _givenToken = "_token";
+        String _givenRefresh = "_refresh";
+        long _givenValidity = 12345;
+        long _givenRefreshValidity = 54321;
+        AuthInformation _givenAuthInformation = new AuthInformation(null, null, _givenValidity, _givenRefreshValidity, _givenToken, _givenRefresh, null);
+        Mockito.lenient().doReturn(false).when(spyJwtTokenProvider).isExpiration(_givenRefresh);
+        Mockito.lenient().doReturn(true).when(spyJwtTokenProvider).isExpiration(_givenToken);
+        Mockito.lenient().doReturn(_givenAuthInformation).when(mockValueOperations).get(_givenRefresh);
 
+        authService.reIssueToken(_givenToken, _givenRefresh);
+
+        verify(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
     }
 }
