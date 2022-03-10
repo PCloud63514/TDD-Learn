@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
                 request.getValidity(),
                 request.getRefreshValidity(),
                 generateToken.getToken(),
+                generateToken.getRefresh(),
                 "secretKey");
 
         ValueOperations<String, Object> opVal = redisTemplate.opsForValue();
@@ -59,20 +61,21 @@ public class AuthServiceImpl implements AuthService {
     public AuthDataInformation getAuthDataInformation(String token) {
         jwtTokenProvider.getInformation(token);
         ValueOperations<String, Object> opValue = redisTemplate.opsForValue();
-        String refresh = (String)opValue.get(token); // Null 체크
-        if(refresh == null || refresh.isBlank()) throw new RuntimeException();
-        String jsonAuthInformation = (String)opValue.get(refresh); // Null 체크
-//        try {
-//            AuthInformation authInformation = objectMapper.readValue(jsonAuthInformation, AuthInformation.class);
-//            HashOperations<String, Object, Object> opHash = redisTemplate.opsForHash();
-//            opHash.entries(authInformation.getSecretKey());
-//            // 레디스에서 토큰을 이용해서 리플레쉬 조회
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException();
-//        }
 
+        String refresh = (String) opValue.get(token);
+        if (refresh == null || refresh.isBlank()) throw new RuntimeException();
 
-        return null;
+        AuthInformation authInformation = (AuthInformation) opValue.get(refresh);
+        if (authInformation == null) throw new RuntimeException();
+        if (!token.equals(authInformation.getToken())) throw new RuntimeException();
+
+        HashOperations<String, String, Object> opHash = redisTemplate.opsForHash();
+        Map<String, Object> data = opHash.entries(authInformation.getSecretKey());
+
+        return new AuthDataInformation(authInformation.getRole(), authInformation.getTokenProviderDomain(),
+                authInformation.getValidity(), authInformation.getRefreshValidity(),
+                authInformation.getToken(), authInformation.getRefresh(),
+                authInformation.getSecretKey(), data);
     }
 
     @Override

@@ -8,8 +8,8 @@ import java.util.Map;
 public class AuthDataInformation extends AuthInformation {
     private Map<String, Object> data;
 
-    public AuthDataInformation(String role, String tokenProviderDomain, long validity, long refreshValidity, String token, String secretKey, Map<String, Object> data) {
-        super(role, tokenProviderDomain, validity, refreshValidity, token, secretKey);
+    public AuthDataInformation(String role, String tokenProviderDomain, long validity, long refreshValidity, String token, String refresh, String secretKey, Map<String, Object> data) {
+        super(role, tokenProviderDomain, validity, refreshValidity, token, refresh, secretKey);
         this.data = data;
     }
 

@@ -15,5 +15,6 @@ public class AuthInformation implements Serializable {
     private long validity;
     private long refreshValidity;
     private String token;
+    private String refresh;
     private String secretKey;
 }
