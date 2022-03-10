@@ -24,7 +24,7 @@ public class SpyJwtTokenProvider extends JwtTokenProvider {
     @Override
     public JwtToken generate(JwtTokenGenerateRequest request) {
         generate_argumentRequest = request;
-        return generate_returnValue;
+        return generate_returnValue != null ? generate_returnValue : new JwtToken("DefaultToken", "DefaultRefresh");
     }
 
     @Override

@@ -23,7 +23,6 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
     private final UuidProvider uuidProvider;
-    private final ObjectMapper objectMapper;
 
     @Override
     public JwtToken generateToken(TokenIssueRequest request) {
@@ -35,18 +34,11 @@ public class AuthServiceImpl implements AuthService {
                 request.getValidity(),
                 request.getRefreshValidity(),
                 generateToken.getToken(),
-                secretKey);
-
-        String jsonAuthInformation = null;
-        try {
-            jsonAuthInformation = objectMapper.writeValueAsString(authInformation);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("전달받은 정보가 정확하지 않습니다.");
-        }
+                "secretKey");
 
         ValueOperations<String, Object> opVal = redisTemplate.opsForValue();
         opVal.set(generateToken.getToken(), generateToken.getRefresh(), request.getValidity(), TimeUnit.MILLISECONDS);
-        opVal.set(generateToken.getRefresh(), jsonAuthInformation, request.getRefreshValidity(), TimeUnit.MILLISECONDS);
+        opVal.set(generateToken.getRefresh(), authInformation, request.getRefreshValidity(), TimeUnit.MILLISECONDS);
 
         HashOperations<String, Object, Object> opHash = redisTemplate.opsForHash();
         opHash.putAll(secretKey, request.getData());
@@ -55,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         redisTemplate.expire(generateToken.getRefresh(), request.getRefreshValidity(), TimeUnit.MILLISECONDS);
         redisTemplate.expire(secretKey, request.getRefreshValidity(), TimeUnit.MILLISECONDS);
 
-        return new JwtToken(generateToken.getToken(), generateToken.getRefresh());
+        return generateToken;
     }
 
     @Override
@@ -70,14 +62,14 @@ public class AuthServiceImpl implements AuthService {
         String refresh = (String)opValue.get(token); // Null 체크
         if(refresh == null || refresh.isBlank()) throw new RuntimeException();
         String jsonAuthInformation = (String)opValue.get(refresh); // Null 체크
-        try {
-            AuthInformation authInformation = objectMapper.readValue(jsonAuthInformation, AuthInformation.class);
-            HashOperations<String, Object, Object> opHash = redisTemplate.opsForHash();
-            opHash.entries(authInformation.getSecretKey());
-            // 레디스에서 토큰을 이용해서 리플레쉬 조회
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException();
-        }
+//        try {
+//            AuthInformation authInformation = objectMapper.readValue(jsonAuthInformation, AuthInformation.class);
+//            HashOperations<String, Object, Object> opHash = redisTemplate.opsForHash();
+//            opHash.entries(authInformation.getSecretKey());
+//            // 레디스에서 토큰을 이용해서 리플레쉬 조회
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException();
+//        }
 
 
         return null;

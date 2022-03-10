@@ -2,18 +2,17 @@ package org.pcloud.security.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.pcloud.security.data.AuthDataInformation;
-import org.pcloud.security.data.AuthInformation;
 import org.pcloud.security.api.SpyJwtTokenProvider;
+import org.pcloud.security.data.AuthInformation;
 import org.pcloud.security.data.request.TokenIssueRequest;
 import org.pcloud.support.token.jwt.JwtToken;
+import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -36,12 +35,16 @@ class AuthServiceImplTest {
     AuthServiceImpl authService;
     SpyJwtTokenProvider spyJwtTokenProvider;
     StubUuidProvider stubUuidProvider;
-    @Mock
-    ObjectMapper mockObjectMapper;
+    //    @Mock
+//    ObjectMapper mockObjectMapper;
     @Mock
     HashOperations mockHashOperations;
     @Mock
     ValueOperations mockValueOperations;
+    final String givenToken = "token";
+    final String givenTokenNull = "tokenNull";
+    final String givenRefresh = "refresh";
+    final String givenRefreshNull = "refreshNull";
 
     @BeforeEach
     void setUp() {
@@ -49,20 +52,36 @@ class AuthServiceImplTest {
         //                  < Strict Stubbing : 처리되지 않은 Stubbing은 에러처리한다.
         Mockito.lenient().doReturn(mockHashOperations).when(mockRedisTemplate).opsForHash();
         Mockito.lenient().doReturn(mockValueOperations).when(mockRedisTemplate).opsForValue();
+        Mockito.lenient().doReturn(givenRefresh).when(mockValueOperations).get(givenToken);
+        Mockito.lenient().doReturn(null).when(mockValueOperations).get(givenTokenNull);
+        Mockito.lenient().doReturn("authInformation").when(mockValueOperations).get(givenRefresh);
+        Mockito.lenient().doReturn(null).when(mockValueOperations).get(givenRefreshNull);
 
         stubUuidProvider = new StubUuidProvider();
         spyJwtTokenProvider = new SpyJwtTokenProvider();
-        authService = new AuthServiceImpl(spyJwtTokenProvider, mockRedisTemplate, stubUuidProvider, mockObjectMapper);
+
+        authService = new AuthServiceImpl(spyJwtTokenProvider, mockRedisTemplate, stubUuidProvider);
     }
 
-    @Test
-    void generateToken_returnValue() {
+    private TokenIssueRequest getOkTokenIssueRequest() {
         String givenIssueRequestDomain = "domain";
         String givenRole = "role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
+        return new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
+    }
+
+    private TokenIssueRequest getWantValidityAndRefreshValidityTokenIssueRequest(long validity, long refreshValidity) {
+        String givenIssueRequestDomain = "domain";
+        String givenRole = "role";
+        Map<String, Object> givenData = new HashMap<>();
+        return new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, validity, refreshValidity);
+    }
+
+    @Test
+    void generateToken_returnValue() {
+        TokenIssueRequest givenRequest = getOkTokenIssueRequest();
         spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
 
         JwtToken jwtToken = authService.generateToken(givenRequest);
@@ -72,181 +91,43 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void generateToken_passesJwtTokenGenerateRequestToJwtTokenProvider() {
-        String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
-        Map<String, Object> givenData = new HashMap<>();
-        long givenValidity = 10000;
-        long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
-        spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
+    void generateToken_passesRequestToGenerateOfJwtTokenProvider() {
+        TokenIssueRequest givenRequest = getOkTokenIssueRequest();
 
         authService.generateToken(givenRequest);
 
-        assertThat(spyJwtTokenProvider.generate_argumentRequest.getValidityMS()).isEqualTo(givenValidity);
-        assertThat(spyJwtTokenProvider.generate_argumentRequest.getRefreshValidityMS()).isEqualTo(givenRefreshValidity);
+        assertThat(spyJwtTokenProvider.generate_argumentRequest.getValidityMS()).isEqualTo(givenRequest.getValidity());
+        assertThat(spyJwtTokenProvider.generate_argumentRequest.getRefreshValidityMS()).isEqualTo(givenRequest.getRefreshValidity());
     }
 
     @Test
-    void generateToken_passesToSetOfOpsForValue() throws JsonProcessingException {
-        String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
-        Map<String, Object> givenData = new HashMap<>();
-        long givenValidity = 10000;
-        long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
-        UUID givenUUID = UUID.randomUUID();
-        stubUuidProvider.randomUUID_returnValue = givenUUID;
-        spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
-        AuthInformation authInformation = new AuthInformation(givenRole, givenIssueRequestDomain, givenValidity, givenRefreshValidity, "token2", givenUUID.toString());
-        String jsonAuthInformation = mockObjectMapper.writeValueAsString(authInformation);
-
-        JwtToken jwtToken = authService.generateToken(givenRequest);
-
-        verify(mockRedisTemplate.opsForValue()).set(eq(jwtToken.getToken()), eq(jwtToken.getRefresh()), eq(givenValidity), eq(TimeUnit.MILLISECONDS));
-        verify(mockRedisTemplate.opsForValue()).set(eq(jwtToken.getRefresh()), eq(jsonAuthInformation), eq(givenRefreshValidity), eq(TimeUnit.MILLISECONDS));
-    }
-
-    @Test
-    void generateToken_passesToPutAllOfOpsForHash() {
-        String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
-        Map<String, Object> givenData = new HashMap<>();
-        long givenValidity = 10000;
-        long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
-        String givenToken = "token2";
-        String givenRefresh = "refresh2";
-        UUID givenUUID = UUID.randomUUID();
-        stubUuidProvider.randomUUID_returnValue = givenUUID;
+    void generateToken_passesTokenToSetOfOpsForValue() {
+        TokenIssueRequest givenRequest = getOkTokenIssueRequest();
         spyJwtTokenProvider.generate_returnValue = new JwtToken(givenToken, givenRefresh);
-        //when
+
         authService.generateToken(givenRequest);
 
-        verify(mockRedisTemplate.opsForHash()).putAll(eq(givenUUID.toString()), eq(givenData));
+        verify(mockRedisTemplate.opsForValue()).set(eq(givenToken), eq(givenRefresh), eq(givenRequest.getValidity()), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate.opsForValue()).set(eq(givenRefresh), any(AuthInformation.class), eq(givenRequest.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void generateToken_passesDataToPutAllOfOpsForHash() {
+        TokenIssueRequest givenRequest = getOkTokenIssueRequest();
+
+        authService.generateToken(givenRequest);
+
+        verify(mockRedisTemplate.opsForHash()).putAll(eq(stubUuidProvider.randomUUID().toString()), eq(givenRequest.getData()));
     }
 
     @Test
     void generateToken_passesToExpireOfRedisTemplate() {
-        String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
-        Map<String, Object> givenData = new HashMap<>();
-        long givenValidity = 10000;
-        long givenRefreshValidity = 100000;
-        UUID givenUUID = UUID.randomUUID();
-        stubUuidProvider.randomUUID_returnValue = givenUUID;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
-        spyJwtTokenProvider.generate_returnValue = new JwtToken("token2", "refresh");
-        doReturn(true).when(mockRedisTemplate).expire(anyString(), anyLong(), eq(TimeUnit.MILLISECONDS));
+        TokenIssueRequest givenRequest = getOkTokenIssueRequest();
+
         JwtToken jwtToken = authService.generateToken(givenRequest);
 
-        verify(mockRedisTemplate).expire(eq(jwtToken.getToken()), eq(givenValidity), eq(TimeUnit.MILLISECONDS));
-        verify(mockRedisTemplate).expire(eq(jwtToken.getRefresh()), eq(givenRefreshValidity), eq(TimeUnit.MILLISECONDS));
-        verify(mockRedisTemplate).expire(eq(givenUUID.toString()), eq(givenRefreshValidity), eq(TimeUnit.MILLISECONDS));
-    }
-
-    @Test
-    void generateToken_passesToWriteValueAsStringOfObjectMapper() throws JsonProcessingException {
-        String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
-        Map<String, Object> givenData = new HashMap<>();
-        long givenValidity = 10000;
-        long givenRefreshValidity = 100000;
-        TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
-        spyJwtTokenProvider.generate_returnValue = new JwtToken("givenToken", "givenRefresh");
-        stubUuidProvider.randomUUID_returnValue = UUID.randomUUID();
-
-        authService.generateToken(givenRequest);
-
-        verify(mockObjectMapper).writeValueAsString(any());
-    }
-
-    @Test
-    void deleteToken_passesTokenToRedisTemplate() {
-        String givenToken = "givenToken1";
-        doReturn(true).when(mockRedisTemplate).delete(anyString());
-
-        authService.deleteToken(givenToken);
-
-        verify(mockRedisTemplate).delete(eq(givenToken));
-    }
-
-    @Test
-    void getAuthDataInformation_passesToGetInformationOfJwtProvider() {
-        String givenToken = "token";
-        doReturn("refresh").when(mockValueOperations).get(givenToken);
-
-        authService.getAuthDataInformation(givenToken);
-
-        assertThat(spyJwtTokenProvider.getInformation_argumentToken).isEqualTo(givenToken);
-    }
-
-    @Test
-    void getAuthDataInformation_throwRuntimeException() {
-        String givenToken = "token";
-        spyJwtTokenProvider.getInformation_isRuntimeException = true;
-
-        assertThrows(RuntimeException.class, ()-> {
-            authService.getAuthDataInformation(givenToken);
-        });
-    }
-
-    @Test
-    void getAuthDataInformation_passesToGetOfRedisTemplateOpsForValue() {
-        String givenToken = "token";
-        doReturn("refresh").when(mockValueOperations).get(givenToken);
-
-        authService.getAuthDataInformation(givenToken);
-
-        verify(mockRedisTemplate.opsForValue()).get(eq(givenToken));
-        verify(mockRedisTemplate.opsForValue()).get(eq("refresh"));
-    }
-
-    @Test
-    void getAuthDataInformation_RuntimeExceptionToGetOfOpsForValue() {
-        String givenToken = "token";
-        doReturn(null).when(mockValueOperations).get(givenToken);
-
-        assertThrows(RuntimeException.class, ()-> {
-            authService.getAuthDataInformation(givenToken);
-        });
-    }
-
-    @Test
-    void getAuthDataInformation_passesToReadValueOfObjectMapper() throws JsonProcessingException {
-        String givenToken = "token";
-        AuthInformation givenAuthInformation = new AuthInformation("role", "tpd", 0, 0, givenToken, "secretKey");
-        doReturn("refresh").when(mockValueOperations).get(givenToken);
-        doReturn("authInformation").when(mockValueOperations).get("refresh");
-        doReturn("anyString()").when(mockValueOperations).get(anyString());
-        doReturn(givenAuthInformation).when(mockObjectMapper).readValue("authInformation", AuthInformation.class);
-
-        authService.getAuthDataInformation(givenToken);
-
-        verify(mockObjectMapper).readValue(anyString(),  eq(AuthInformation.class));
-    }
-
-    @Test
-    void getAuthDataInformation_passesToEntriesOfOpsForHash() throws JsonProcessingException {
-        String givenToken = "token";
-        AuthInformation givenAuthInformation = new AuthInformation("role", "tpd", 0, 0, givenToken, "secretKey");
-
-        doReturn("refresh").when(mockValueOperations).get(givenToken);
-        doReturn("authInformation").when(mockValueOperations).get("refresh");
-        doReturn(givenAuthInformation).when(mockObjectMapper).readValue("authInformation", AuthInformation.class);
-//        doReturn(any()).when(mockHashOperations).entries(givenAuthInformation.getSecretKey());
-//        doReturn("anyString()").when(mockValueOperations).get(anyString());
-
-        authService.getAuthDataInformation(givenToken);
-
-        verify(mockRedisTemplate.opsForHash()).entries(eq(givenAuthInformation.getSecretKey()));
-    }
-
-    @Test
-    void getAuthDataInformation_RunTimeExceptionToPassesRefreshToGetOfOpsForValue() {
-        String givenToken = "token";
-        AuthInformation givenAuthInformation = new AuthInformation("role", "tpd", 0, 0, givenToken, "secretKey");
-        doReturn("refresh").when(mockValueOperations).get(givenToken);
-        doReturn(givenAuthInformation).when(mockValueOperations).get("refresh");
+        verify(mockRedisTemplate).expire(eq(jwtToken.getToken()), eq(givenRequest.getValidity()), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(jwtToken.getRefresh()), eq(givenRequest.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(stubUuidProvider.randomUUID().toString()), eq(givenRequest.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
     }
 }

@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class AuthInformation {
+public class AuthInformation implements Serializable {
     private String role;
     private String tokenProviderDomain;
     private long validity;
