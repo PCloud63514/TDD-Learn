@@ -170,7 +170,7 @@ class AuthServiceImplTest {
     void getAuthDataInformation_throwRuntimeExceptionToExpiredJwt() {
         doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
 
-        assertThrows(RuntimeException.class, ()-> authService.getAuthDataInformation(givenToken));
+        assertThrows(RuntimeException.class, () -> authService.getAuthDataInformation(givenToken));
     }
 
     @Test
@@ -223,11 +223,26 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void reIssueToken_returnValue() {
+    void reIssueToken_returnValue_tokenNotExpiration() {
+        Mockito.lenient().doReturn(false).when(spyJwtTokenProvider).isExpiration(givenToken);
+
         JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh);
 
         assertThat(jwtToken.getToken()).isEqualTo(givenToken);
         assertThat(jwtToken.getRefresh()).isEqualTo(givenRefresh);
+    }
+
+    @Test
+    void reIssueToken_returnValue_tokenExpiration() {
+        String _givenToken = "newToken";
+        String _givenRefresh = "newRefresh";
+        Mockito.lenient().doReturn(true).when(spyJwtTokenProvider).isExpiration(givenToken);
+        Mockito.lenient().doReturn(new JwtToken(_givenToken, _givenRefresh)).when(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
+
+        JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh);
+
+        assertThat(jwtToken.getToken()).isEqualTo(_givenToken);
+        assertThat(jwtToken.getRefresh()).isEqualTo(_givenRefresh);
     }
 
     @Test
@@ -241,7 +256,7 @@ class AuthServiceImplTest {
     void reIssueToken_throwRuntimeExceptionToExpiredJwt() {
         doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
 
-        assertThrows(RuntimeException.class, ()-> authService.reIssueToken(givenToken, givenRefresh));
+        assertThrows(RuntimeException.class, () -> authService.reIssueToken(givenToken, givenRefresh));
     }
 
     @Test
@@ -270,11 +285,13 @@ class AuthServiceImplTest {
     void reIssueToken_passesNotExpirationTokenToIsExpirationOfJwtTokenProvider() {
         String _givenToken = "tokenNotExpiration";
         String _givenRefresh = "refreshNotExpiration";
+        Mockito.lenient().doReturn(false).when(spyJwtTokenProvider).isExpiration(_givenToken);
         AuthInformation _givenAuthInformation = new AuthInformation(null, null, 0, 0, _givenToken, _givenRefresh, null);
         doReturn(_givenAuthInformation).when(mockValueOperations).get(_givenRefresh);
 
         JwtToken jwtToken = authService.reIssueToken(_givenToken, _givenRefresh);
 
+        verify(spyJwtTokenProvider).isExpiration(eq(_givenToken));
         assertThat(jwtToken.getToken()).isEqualTo(_givenToken);
         assertThat(jwtToken.getRefresh()).isEqualTo(_givenRefresh);
     }
@@ -293,5 +310,45 @@ class AuthServiceImplTest {
         authService.reIssueToken(_givenToken, _givenRefresh);
 
         verify(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
+    }
+
+    @Test
+    void reIssue_tokenExpirationToSetOfOpsForValue() {
+        String _givenToken = "newToken";
+        String _givenRefresh = "newRefresh";
+        Mockito.lenient().doReturn(true).when(spyJwtTokenProvider).isExpiration(givenToken);
+        Mockito.lenient().doReturn(new JwtToken(_givenToken, _givenRefresh)).when(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
+
+        authService.reIssueToken(givenToken, givenRefresh);
+
+        verify(mockRedisTemplate.opsForValue()).set(eq(_givenToken), eq(_givenRefresh));
+        verify(mockRedisTemplate.opsForValue()).set(eq(_givenRefresh), any(AuthInformation.class));
+    }
+
+    @Test
+    void reIssue_tokenExpirationToDeleteOfRedisTemplate() {
+        String _givenToken = "newToken";
+        String _givenRefresh = "newRefresh";
+        Mockito.lenient().doReturn(true).when(spyJwtTokenProvider).isExpiration(givenToken);
+        Mockito.lenient().doReturn(new JwtToken(_givenToken, _givenRefresh)).when(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
+
+        authService.reIssueToken(givenToken, givenRefresh);
+
+        verify(mockRedisTemplate).delete(eq(givenToken));
+        verify(mockRedisTemplate).delete(eq(givenRefresh));
+    }
+
+    @Test
+    void reIssue_tokenExpirationToExpireOfRedisTemplate() {
+        String _givenToken = "newToken";
+        String _givenRefresh = "newRefresh";
+        Mockito.lenient().doReturn(true).when(spyJwtTokenProvider).isExpiration(givenToken);
+        Mockito.lenient().doReturn(new JwtToken(_givenToken, _givenRefresh)).when(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
+
+        authService.reIssueToken(givenToken, givenRefresh);
+
+        verify(mockRedisTemplate).expire(eq(_givenToken), eq(givenAuthInformation.getValidity()), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(_givenRefresh), eq(givenAuthInformation.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(givenAuthInformation.getSecretKey()), eq(givenAuthInformation.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
     }
 }

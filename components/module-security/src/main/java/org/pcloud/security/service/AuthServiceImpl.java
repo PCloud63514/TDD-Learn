@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthDataInformation getAuthDataInformation(String token) {
-        if(jwtTokenProvider.isExpiration(token)) throw new RuntimeException();
+        if (jwtTokenProvider.isExpiration(token)) throw new RuntimeException();
         ValueOperations<String, Object> opValue = redisTemplate.opsForValue();
 
         String refresh = (String) opValue.get(token);
@@ -75,23 +75,30 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtToken reIssueToken(String token, String refresh) {
-        if(jwtTokenProvider.isExpiration(refresh)) throw new RuntimeException();
+        if (jwtTokenProvider.isExpiration(refresh)) throw new RuntimeException();
         ValueOperations<String, Object> opValue = redisTemplate.opsForValue();
         AuthInformation authInformation = (AuthInformation) opValue.get(refresh);
         if (authInformation == null) throw new RuntimeException();
         if (!token.equals(authInformation.getToken())) throw new RuntimeException();
 
-        if(!jwtTokenProvider.isExpiration(token)) {
+        if (!jwtTokenProvider.isExpiration(token)) {
             return new JwtToken(token, refresh);
         }
 
-        // jwt 새로 발급
-        jwtTokenProvider.generate(new JwtTokenGenerateRequest(authInformation.getValidity(), authInformation.getRefreshValidity()));
-        // 토큰 -> refresh
-        // refresh -> authInformation 구조 다시 만듬 형태로 redis 등록
+        JwtToken newJwtToken = jwtTokenProvider.generate(new JwtTokenGenerateRequest(authInformation.getValidity(), authInformation.getRefreshValidity()));
+        opValue.set(newJwtToken.getToken(), newJwtToken.getRefresh());
+        AuthInformation newAuthInformation = new AuthInformation(authInformation.getRole(), authInformation.getTokenProviderDomain(),
+                authInformation.getValidity(), authInformation.getRefreshValidity(),
+                newJwtToken.getToken(), newJwtToken.getRefresh(), authInformation.getSecretKey());
+        opValue.set(newJwtToken.getRefresh(), newAuthInformation);
 
-        // 이전 토큰 & refresh 폐기
-        // 새로 넣은 데이터들 및 secretKey에 있던 데이터 시간 갱신
-        return new JwtToken(token, refresh);
+        redisTemplate.delete(token);
+        redisTemplate.delete(refresh);
+
+        redisTemplate.expire(newJwtToken.getToken(), newAuthInformation.getValidity(), TimeUnit.MILLISECONDS);
+        redisTemplate.expire(newJwtToken.getRefresh(), newAuthInformation.getRefreshValidity(), TimeUnit.MILLISECONDS);
+        redisTemplate.expire(newAuthInformation.getSecretKey(), newAuthInformation.getRefreshValidity(), TimeUnit.MILLISECONDS);
+
+        return newJwtToken;
     }
 }
