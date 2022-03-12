@@ -12,6 +12,9 @@ server:
         http-only: true # js 조회 안됨
 #        secure: true # https
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   profiles:
     active: local
   cache:

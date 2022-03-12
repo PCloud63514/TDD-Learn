@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8888
   servlet:
     encoding:
       charset: UTF-8
@@ -22,8 +22,8 @@ server:
 #      defaultZone: http://localhost:8686/eureka
 
 spring:
-#  main:
-#    web-application-type: reactive
+  main:
+    allow-bean-definition-overriding: true
   profiles:
     active: local
   cache:
