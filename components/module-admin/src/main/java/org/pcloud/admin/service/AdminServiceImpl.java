@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,12 @@ public class AdminServiceImpl implements AdminService {
 
         JwtTokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
 
+        Cookie cookie = new Cookie("refresh", tokenResponse.getRefresh());
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+        response.addCookie(cookie);
         response.addHeader("token", tokenResponse.getToken());
-        response.addHeader("refresh", tokenResponse.getRefresh());
+//        response.addHeader("refresh", tokenResponse.getRefresh());
     }
 }

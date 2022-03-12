@@ -4,6 +4,17 @@ server:
     encoding:
       charset: UTF-8
       force: true
+
+#eureka:
+#  instance:
+#    instance-id: gateway-microservice-instance
+#    appname: gateway-service
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8686/eureka
+
 spring:
   profiles:
     active: local
