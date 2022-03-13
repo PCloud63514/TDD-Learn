@@ -42,4 +42,4 @@ module:
 
 feign-client:
   auth:
-    url: http://localhost:8080/auth
+    url: http://localhost:8888/auth

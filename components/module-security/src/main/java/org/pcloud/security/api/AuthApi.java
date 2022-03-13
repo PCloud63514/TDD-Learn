@@ -7,7 +7,7 @@ import org.pcloud.security.service.AuthService;
 import org.pcloud.support.token.jwt.JwtToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RequestMapping("auth")
@@ -17,10 +17,10 @@ public class AuthApi {
 
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping
-    public Flux<JwtTokenResponse> issueToken(@RequestBody TokenIssueRequest request) {
+    public Mono<JwtTokenResponse> issueToken(@RequestBody TokenIssueRequest request) {
         JwtToken jwtToken = this.authService.generateToken(request);
         JwtTokenResponse jwtTokenResponse = new JwtTokenResponse(jwtToken.getToken(), jwtToken.getRefresh());
-        return Flux.just(jwtTokenResponse);
+        return Mono.just(jwtTokenResponse);
     }
 
     @DeleteMapping("{token}")

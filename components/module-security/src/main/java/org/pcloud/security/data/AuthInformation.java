@@ -3,7 +3,7 @@ package org.pcloud.security.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
+//import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 import java.io.Serializable;
 
@@ -18,8 +18,8 @@ public class AuthInformation implements Serializable {
     private String token;
     private String refresh;
     private String secretKey;
-
-    public AbstractAuthenticationToken toAuthentication() {
-        return null;
-    }
+//
+//    public AbstractAuthenticationToken toAuthentication() {
+//        return null;
+//    }
 }

@@ -2,15 +2,18 @@ dependencies {
     implementation project(':components:library-security')
     implementation project(':components:support-token')
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
     //Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS.
     // https://mvnrepository.com/artifact/io.netty/netty-resolver-dns-native-macos
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64' // << springBootVersion이 2.6.3 이상에만 찾을 수 있다.
 
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1' // 추가 안시키면 securityConfig 에러 뜸
 }
