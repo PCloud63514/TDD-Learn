@@ -1,8 +1,8 @@
 package org.pcloud.admin.service;
 
-import org.pcloud.security.data.request.TokenIssueRequest;
-import org.pcloud.security.data.response.JwtTokenResponse;
-import org.pcloud.security.network.AuthClient;
+import org.pcloud.gateway.data.request.TokenIssueRequest;
+import org.pcloud.gateway.data.response.JwtTokenResponse;
+import org.pcloud.gateway.network.AuthClient;
 
 public class SpyAuthClient implements AuthClient {
     public TokenIssueRequest issueToken_argumentRequest;

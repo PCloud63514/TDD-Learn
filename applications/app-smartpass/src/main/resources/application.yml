@@ -1,5 +1,5 @@
 server:
-  port: 8180
+  port: 0
   servlet:
     encoding:
       charset: UTF-8
@@ -11,7 +11,20 @@ server:
         name: SID
         http-only: true # js 조회 안됨
 #        secure: true # https
+
+eureka:
+  instance:
+    instance-id: smartpass-microservice-instance
+    appname: smartpass-service
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
 spring:
+  application:
+    name: smartpass-service
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -42,4 +55,4 @@ module:
 
 feign-client:
   auth:
-    url: http://localhost:8888/auth
+    url: http://localhost:8080/auth

@@ -1,0 +1,11 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-service # Application 이름 지정
+
+eureka:
+  client:
+    register-with-eureka: false # 해당 서버를 Client로 동작시킬 것인지 설정
+    fetch-registry: false # 자신을 Discovery에 등록할 것인지
