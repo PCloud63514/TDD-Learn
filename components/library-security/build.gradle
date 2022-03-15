@@ -1,5 +1,4 @@
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.apache.httpcomponents:httpclient'
     implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -9,4 +8,6 @@ dependencies {
     implementation 'io.github.openfeign:feign-okhttp'
     implementation 'io.github.openfeign:feign-jackson'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
 }

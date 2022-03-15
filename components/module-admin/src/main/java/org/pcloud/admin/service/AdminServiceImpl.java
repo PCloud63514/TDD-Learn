@@ -1,14 +1,14 @@
 package org.pcloud.admin.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pcloud.admin.data.request.AdminLoginRequest;
-import org.pcloud.admin.data.response.AdminGetsResponse;
-import org.pcloud.admin.provider.InitializedPasswordProvider;
-import org.pcloud.admin.provider.LocalDateTimeProvider;
 import org.pcloud.admin.data.request.AdminJoinRequest;
+import org.pcloud.admin.data.request.AdminLoginRequest;
 import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
+import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
+import org.pcloud.admin.provider.InitializedPasswordProvider;
+import org.pcloud.admin.provider.LocalDateTimeProvider;
 import org.pcloud.admin.repository.AdminRepository;
 import org.pcloud.gateway.data.request.TokenIssueRequest;
 import org.pcloud.gateway.data.response.JwtTokenResponse;
@@ -76,12 +76,12 @@ public class AdminServiceImpl implements AdminService {
 
         JwtTokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
 
-        Cookie cookie = new Cookie("refresh", tokenResponse.getRefresh());
+        Cookie cookie = new Cookie("refresh_token", tokenResponse.getRefreshToken());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
+//        cookie.setSecure(true);
 
         response.addCookie(cookie);
-        response.addHeader("token", tokenResponse.getToken());
-//        response.addHeader("refresh", tokenResponse.getRefresh());
+        response.addHeader("access_token", tokenResponse.getAccessToken());
     }
 }

@@ -51,8 +51,8 @@ class JwtTokenServiceImplTest {
 
         assertThat(token.getToken()).isEqualTo(stubTokenProvider.generate(givenRequest).getToken());
         assertThat(token.getRefresh()).isEqualTo(stubTokenProvider.generate(givenRequest).getRefresh());
-        assertThat(givenHttpServletResponse.getHeader("token")).isEqualTo(token.getToken());
-        assertThat(givenHttpServletResponse.getHeader("refresh")).isEqualTo(token.getRefresh());
+        assertThat(givenHttpServletResponse.getHeader("access_token")).isEqualTo(token.getToken());
+        assertThat(givenHttpServletResponse.getHeader("refresh_token")).isEqualTo(token.getRefresh());
     }
 
     @Test

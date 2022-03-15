@@ -230,15 +230,14 @@ class AdminServiceImplTest {
         String givenToken = "token";
         String givenRefresh = "refresh";
         AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
-        HttpServletResponse givenResponse = new MockHttpServletResponse();
+        MockHttpServletResponse givenResponse = new MockHttpServletResponse();
         Admin givenAdmin = Admin.create(givenId, givenPassword, givenRole, null, null);
         spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.of(givenAdmin);
         spyAuthClient.issueToken_returnValue = new JwtTokenResponse(givenToken, givenRefresh);
 
         adminService.login(givenRequest, givenResponse);
-
-        assertThat(givenResponse.getHeader("token")).isEqualTo(givenToken);
-        assertThat(givenResponse.getHeader("refresh")).isEqualTo(givenRefresh);
+        assertThat(givenResponse.getHeader("access_token")).isEqualTo(givenToken);
+        assertThat(givenResponse.getCookie("refresh_token").getValue()).isEqualTo(givenRefresh);
     }
 
     @Test

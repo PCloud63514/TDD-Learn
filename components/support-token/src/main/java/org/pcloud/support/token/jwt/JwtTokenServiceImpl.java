@@ -19,8 +19,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     public JwtToken generateToken(JwtTokenGenerateRequest request, HttpServletResponse response) throws Exception {
         JwtToken jwtToken = this.generateToken(request);
-        response.setHeader("token", jwtToken.getToken());
-        response.setHeader("refresh", jwtToken.getRefresh());
+        response.setHeader("access_token", jwtToken.getToken());
+        response.setHeader("refresh_token", jwtToken.getRefresh());
         return jwtToken;
     }
 

@@ -2,15 +2,21 @@ package org.pcloud.gateway.data.response;
 
 import lombok.Getter;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Getter
 public class JwtTokenResponse extends TokenResponse {
-    private String refresh;
+    private String refreshToken;
 
-    public JwtTokenResponse(String token, String refresh) {
-        super(token);
-        this.refresh = refresh;
+    public JwtTokenResponse(String accessToken, String refreshToken) {
+        super(accessToken);
+        this.refreshToken = refreshToken;
     }
 
     public JwtTokenResponse() {
+    }
+
+    public void append(HttpServletResponse response) {
+
     }
 }
