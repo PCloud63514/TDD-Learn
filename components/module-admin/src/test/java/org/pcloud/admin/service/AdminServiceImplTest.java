@@ -11,6 +11,7 @@ import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.provider.StubLocalDateTimeProvider;
 import org.pcloud.gateway.data.response.JwtTokenResponse;
+import org.pcloud.gateway.utils.JwtAuthUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,9 +181,7 @@ class AdminServiceImplTest {
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
         spyAdminRepository.findById_returnValue = Optional.empty();
 
-        assertThrows(RuntimeException.class, () -> {
-            adminService.passwordInit(givenRequest);
-        });
+        assertThrows(RuntimeException.class, () -> adminService.passwordInit(givenRequest));
     }
 
     @Test
@@ -204,10 +204,10 @@ class AdminServiceImplTest {
     void login_passesTokenIssueRequestToAuthClient_issueToken() {
         String givenId = "id";
         String givenPassword = "password";
-        String givenRole = "role";
+        String givenRole = "ROLE_role";
         AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
         HttpServletResponse givenResponse = new MockHttpServletResponse();
-        Admin givenAdmin = Admin.create(givenId, givenPassword, givenRole, null, null);
+        Admin givenAdmin = Admin.create(givenId, givenPassword, "role", null, null);
         spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.of(givenAdmin);
         spyAuthClient.issueToken_returnValue = new JwtTokenResponse();
         HashMap<String, Object> givenData = new HashMap<>();
@@ -237,8 +237,8 @@ class AdminServiceImplTest {
 
         adminService.login(givenRequest, givenResponse);
 
-        assertThat(givenResponse.getHeader("access_token")).isEqualTo(givenToken);
-        assertThat(givenResponse.getCookie("refresh_token").getValue()).isEqualTo(givenRefresh);
+        assertThat(givenResponse.getHeader(JwtAuthUtil.ACCESS_TOKEN_SYNTAX)).isEqualTo(givenToken);
+        assertThat(Objects.requireNonNull(givenResponse.getCookie(JwtAuthUtil.REFRESH_TOKEN_SYNTAX)).getValue()).isEqualTo(givenRefresh);
     }
 
     @Test

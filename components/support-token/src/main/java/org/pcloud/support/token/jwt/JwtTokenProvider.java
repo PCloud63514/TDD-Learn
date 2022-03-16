@@ -61,7 +61,7 @@ public class JwtTokenProvider implements TokenProvider<JwtToken, JwtTokenGenerat
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException expiredJwtException) {
-            expiredJwtException.printStackTrace();
+//            expiredJwtException.printStackTrace();
             return true;
         }
         return false;

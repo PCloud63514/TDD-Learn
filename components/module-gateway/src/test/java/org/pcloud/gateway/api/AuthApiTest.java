@@ -45,7 +45,7 @@ class AuthApiTest {
     @Test
     void issueToken_createdHttpStatus() throws Exception {
         String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
+        String givenRole = "ROLE_role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
@@ -81,7 +81,7 @@ class AuthApiTest {
     @Test
     void issueToken_passesTokenIssueRequestToAuthService() throws Exception {
         String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
+        String givenRole = "ROLE_role";
         Map<String, Object> givenData = new HashMap<>();
         givenData.put("userId", 1);
         givenData.put("userName", "PCloud");

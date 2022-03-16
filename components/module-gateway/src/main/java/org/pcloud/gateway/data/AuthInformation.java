@@ -15,9 +15,9 @@ public class AuthInformation implements Serializable {
     private String tokenProviderDomain;
     private long validity;
     private long refreshValidity;
-    private String token;
-    private String refresh;
-    private String secretKey;
+    private String accessToken;
+    private String refreshToken;
+    private String dataSignKey;
 //
 //    public AbstractAuthenticationToken toAuthentication() {
 //        return null;

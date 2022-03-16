@@ -5,6 +5,8 @@ import org.pcloud.gateway.data.request.TokenIssueRequest;
 import org.pcloud.gateway.service.AuthService;
 import org.pcloud.support.token.jwt.JwtToken;
 
+import java.util.Optional;
+
 public class SpyAuthService implements AuthService {
     public TokenIssueRequest generateToken_argumentRequest;
     public JwtToken generateToken_returnValue;
@@ -23,13 +25,13 @@ public class SpyAuthService implements AuthService {
     }
 
     @Override
-    public AuthDataInformation getAuthDataInformation(String token) {
+    public Optional<AuthDataInformation> getAuthDataInformation(String token) {
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public JwtToken reIssueToken(String token, String refresh) {
-        return null;
+    public Optional<JwtToken> reIssueToken(String token, String refresh) {
+        return Optional.empty();
     }
 }

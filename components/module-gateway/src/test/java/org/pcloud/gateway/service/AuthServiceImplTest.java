@@ -20,10 +20,10 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -64,7 +64,7 @@ class AuthServiceImplTest {
 
     private TokenIssueRequest getOkTokenIssueRequest() {
         String givenIssueRequestDomain = "domain";
-        String givenRole = "role";
+        String givenRole = "ROLE_role";
         Map<String, Object> givenData = new HashMap<>();
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
@@ -145,17 +145,17 @@ class AuthServiceImplTest {
         AuthInformation _givenAuthInformation = new AuthInformation(givenRole, givenTokenProviderDomain, _givenValidity, _givenRefreshValidity, _givenToken, _givenRefresh, _givenSecretKey);
         doReturn(_givenRefresh).when(mockValueOperations).get(_givenToken);
         doReturn(_givenAuthInformation).when(mockValueOperations).get(_givenRefresh);
-        doReturn(givenData).when(mockHashOperations).entries(_givenAuthInformation.getSecretKey());
+        doReturn(givenData).when(mockHashOperations).entries(_givenAuthInformation.getDataSignKey());
 
-        AuthDataInformation authDataInformation = authService.getAuthDataInformation(_givenToken);
+        AuthDataInformation authDataInformation = authService.getAuthDataInformation(_givenToken).orElseThrow();
 
         assertThat(authDataInformation.getRole()).isEqualTo(_givenAuthInformation.getRole());
         assertThat(authDataInformation.getTokenProviderDomain()).isEqualTo(_givenAuthInformation.getTokenProviderDomain());
         assertThat(authDataInformation.getValidity()).isEqualTo(_givenAuthInformation.getValidity());
         assertThat(authDataInformation.getRefreshValidity()).isEqualTo(_givenAuthInformation.getRefreshValidity());
-        assertThat(authDataInformation.getToken()).isEqualTo(_givenAuthInformation.getToken());
-        assertThat(authDataInformation.getRefresh()).isEqualTo(_givenAuthInformation.getRefresh());
-        assertThat(authDataInformation.getSecretKey()).isEqualTo(_givenSecretKey);
+        assertThat(authDataInformation.getAccessToken()).isEqualTo(_givenAuthInformation.getAccessToken());
+        assertThat(authDataInformation.getRefreshToken()).isEqualTo(_givenAuthInformation.getRefreshToken());
+        assertThat(authDataInformation.getDataSignKey()).isEqualTo(_givenSecretKey);
         assertThat(authDataInformation.getData()).isEqualTo(givenData);
     }
 
@@ -170,9 +170,9 @@ class AuthServiceImplTest {
     void getAuthDataInformation_throwRuntimeExceptionToExpiredJwt() {
         doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
 
-        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenToken);
+        Optional<AuthDataInformation> authDataInformation = authService.getAuthDataInformation(givenToken);
 
-        assertThat(authDataInformation).isNull();
+        assertThat(authDataInformation.isEmpty()).isTrue();
     }
 
     @Test
@@ -184,9 +184,9 @@ class AuthServiceImplTest {
 
     @Test
     void getAuthDataInformation_RunTimeExceptionToGiveTokenAndGetAnNull() {
-        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenTokenNull);
+        Optional<AuthDataInformation> authDataInformation = authService.getAuthDataInformation(givenTokenNull);
 
-        assertThat(authDataInformation).isNull();
+        assertThat(authDataInformation.isEmpty()).isTrue();
     }
 
     @Test
@@ -207,9 +207,9 @@ class AuthServiceImplTest {
     void getAuthDataInformation_throwRuntimeExceptionToGiveRefreshAndGetAnNull() {
         doReturn(null).when(mockValueOperations).get(givenRefresh);
 
-        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenToken);
+        Optional<AuthDataInformation> authDataInformation = authService.getAuthDataInformation(givenToken);
 
-        assertThat(authDataInformation).isNull();
+        assertThat(authDataInformation.isEmpty()).isTrue();
     }
 
     @Test
@@ -217,23 +217,23 @@ class AuthServiceImplTest {
         AuthInformation givenAuthInformation = new AuthInformation(null, null, 0, 0, "failToken", "failRefresh", null);
         doReturn(givenAuthInformation).when(mockValueOperations).get(givenRefresh);
 
-        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenToken);
+        Optional<AuthDataInformation> authDataInformation = authService.getAuthDataInformation(givenToken);
 
-        assertThat(authDataInformation).isNull();
+        assertThat(authDataInformation.isEmpty()).isTrue();
     }
 
     @Test
     void getAuthDataInformation_passesSecretKeyToEntriesOfOpsForHash() {
         authService.getAuthDataInformation(givenToken);
 
-        verify(mockRedisTemplate.opsForHash()).entries(eq(givenAuthInformation.getSecretKey()));
+        verify(mockRedisTemplate.opsForHash()).entries(eq(givenAuthInformation.getDataSignKey()));
     }
 
     @Test
     void reIssueToken_returnValue_tokenNotExpiration() {
         Mockito.lenient().doReturn(false).when(spyJwtTokenProvider).isExpiration(givenToken);
 
-        JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh);
+        JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh).orElseThrow();
 
         assertThat(jwtToken.getToken()).isEqualTo(givenToken);
         assertThat(jwtToken.getRefresh()).isEqualTo(givenRefresh);
@@ -246,7 +246,7 @@ class AuthServiceImplTest {
         Mockito.lenient().doReturn(true).when(spyJwtTokenProvider).isExpiration(givenToken);
         Mockito.lenient().doReturn(new JwtToken(_givenToken, _givenRefresh)).when(spyJwtTokenProvider).generate(any(JwtTokenGenerateRequest.class));
 
-        JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh);
+        JwtToken jwtToken = authService.reIssueToken(givenToken, givenRefresh).orElseThrow();
 
         assertThat(jwtToken.getToken()).isEqualTo(_givenToken);
         assertThat(jwtToken.getRefresh()).isEqualTo(_givenRefresh);
@@ -263,7 +263,9 @@ class AuthServiceImplTest {
     void reIssueToken_throwRuntimeExceptionToExpiredJwt() {
         doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
 
-        assertThrows(RuntimeException.class, () -> authService.reIssueToken(givenToken, givenRefresh));
+        boolean isEmpty = authService.reIssueToken(givenToken, givenRefresh).isEmpty();
+
+        assertThat(isEmpty).isTrue();
     }
 
     @Test
@@ -275,13 +277,17 @@ class AuthServiceImplTest {
 
     @Test
     void reIssueToken_throwRunTimeExceptionAndPassesRefreshToGetOfOpsForValue() {
-        assertThrows(RuntimeException.class, () -> authService.reIssueToken(givenToken, givenRefreshNull));
+        boolean isEmpty = authService.reIssueToken(givenToken, givenRefreshNull).isEmpty();
+
+        assertThat(isEmpty).isTrue();
         verify(mockRedisTemplate.opsForValue()).get(eq(givenRefreshNull));
     }
 
     @Test
     void reIssueToken_throwRunTimeExceptionAndCompareTokenAndRefresh() {
-        assertThrows(RuntimeException.class, () -> authService.reIssueToken("testToken", givenRefresh));
+        boolean isEmpty = authService.reIssueToken("testToken", givenRefresh).isEmpty();
+
+        assertThat(isEmpty).isTrue();
     }
 
     @Test
@@ -292,7 +298,7 @@ class AuthServiceImplTest {
         AuthInformation _givenAuthInformation = new AuthInformation(null, null, 0, 0, _givenToken, _givenRefresh, null);
         doReturn(_givenAuthInformation).when(mockValueOperations).get(_givenRefresh);
 
-        JwtToken jwtToken = authService.reIssueToken(_givenToken, _givenRefresh);
+        JwtToken jwtToken = authService.reIssueToken(_givenToken, _givenRefresh).orElseThrow();
 
         verify(spyJwtTokenProvider).isExpiration(eq(_givenToken));
         assertThat(jwtToken.getToken()).isEqualTo(_givenToken);
@@ -352,6 +358,6 @@ class AuthServiceImplTest {
 
         verify(mockRedisTemplate).expire(eq(_givenToken), eq(givenAuthInformation.getValidity()), eq(TimeUnit.MILLISECONDS));
         verify(mockRedisTemplate).expire(eq(_givenRefresh), eq(givenAuthInformation.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
-        verify(mockRedisTemplate).expire(eq(givenAuthInformation.getSecretKey()), eq(givenAuthInformation.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
+        verify(mockRedisTemplate).expire(eq(givenAuthInformation.getDataSignKey()), eq(givenAuthInformation.getRefreshValidity()), eq(TimeUnit.MILLISECONDS));
     }
 }

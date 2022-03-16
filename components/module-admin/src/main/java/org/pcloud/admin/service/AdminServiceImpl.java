@@ -13,11 +13,11 @@ import org.pcloud.admin.repository.AdminRepository;
 import org.pcloud.gateway.data.request.TokenIssueRequest;
 import org.pcloud.gateway.data.response.JwtTokenResponse;
 import org.pcloud.gateway.network.AuthClient;
+import org.pcloud.gateway.utils.JwtAuthUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -72,16 +72,9 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(RuntimeException::new);
         HashMap<String, Object> data = new HashMap<>();
         data.put("id", admin.getId());
-        TokenIssueRequest tokenIssueRequest = new TokenIssueRequest("admin", admin.getRole(), data, 60000, 600000);
+        TokenIssueRequest tokenIssueRequest = new TokenIssueRequest("admin", "ROLE_" + admin.getRole(), data, 60000, 600000);
 
         JwtTokenResponse tokenResponse = authClient.issueToken(tokenIssueRequest);
-
-        Cookie cookie = new Cookie("refresh_token", tokenResponse.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-//        cookie.setSecure(true);
-
-        response.addCookie(cookie);
-        response.addHeader("access_token", tokenResponse.getAccessToken());
+        JwtAuthUtil.injectAuthorization(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), response);
     }
 }
