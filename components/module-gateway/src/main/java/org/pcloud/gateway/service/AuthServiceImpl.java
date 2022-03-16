@@ -54,15 +54,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthDataInformation getAuthDataInformation(String token) {
-        if (jwtTokenProvider.isExpiration(token)) throw new RuntimeException();
+        if (jwtTokenProvider.isExpiration(token)) return null;
         ValueOperations<String, Object> opValue = redisTemplate.opsForValue();
 
         String refresh = (String) opValue.get(token);
-        if (refresh == null || refresh.isBlank()) throw new RuntimeException();
+        if (refresh == null || refresh.isBlank()) return null;
 
         AuthInformation authInformation = (AuthInformation) opValue.get(refresh);
-        if (authInformation == null) throw new RuntimeException();
-        if (!token.equals(authInformation.getToken())) throw new RuntimeException();
+        if (authInformation == null) return null;
+        if (!token.equals(authInformation.getToken())) return null;
 
         HashOperations<String, String, Object> opHash = redisTemplate.opsForHash();
         Map<String, Object> data = opHash.entries(authInformation.getSecretKey());

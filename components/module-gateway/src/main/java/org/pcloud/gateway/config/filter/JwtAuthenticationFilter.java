@@ -20,6 +20,10 @@ public class JwtAuthenticationFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         String refreshToken = getRefreshToken(request);
 
+        // 흠 권한 필요 없는 애들은 통과가 되긴 해야함
+        // 이를 판단했을 때 내부적으로 뭐가 안되었다 싶으면 예외처리해버리면 힘들긴함
+        // 물론 클라이언트가 모든 요청에 토큰을 담을 것이 아니라 특정한 요청만 담으면 되긴 함
+
         // 기간만료 등이 나오면?
         return chain.filter(exchange);
     }

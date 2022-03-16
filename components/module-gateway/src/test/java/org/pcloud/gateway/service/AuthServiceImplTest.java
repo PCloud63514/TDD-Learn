@@ -170,7 +170,9 @@ class AuthServiceImplTest {
     void getAuthDataInformation_throwRuntimeExceptionToExpiredJwt() {
         doReturn(true).when(spyJwtTokenProvider).isExpiration(any());
 
-        assertThrows(RuntimeException.class, () -> authService.getAuthDataInformation(givenToken));
+        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenToken);
+
+        assertThat(authDataInformation).isNull();
     }
 
     @Test
@@ -182,8 +184,9 @@ class AuthServiceImplTest {
 
     @Test
     void getAuthDataInformation_RunTimeExceptionToGiveTokenAndGetAnNull() {
-        assertThrows(RuntimeException.class, () ->
-                authService.getAuthDataInformation(givenTokenNull));
+        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenTokenNull);
+
+        assertThat(authDataInformation).isNull();
     }
 
     @Test
@@ -203,16 +206,20 @@ class AuthServiceImplTest {
     @Test
     void getAuthDataInformation_throwRuntimeExceptionToGiveRefreshAndGetAnNull() {
         doReturn(null).when(mockValueOperations).get(givenRefresh);
-        assertThrows(RuntimeException.class, () ->
-                authService.getAuthDataInformation(givenToken));
+
+        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenToken);
+
+        assertThat(authDataInformation).isNull();
     }
 
     @Test
     void getAuthDataInformation_throwRunTimeExceptionToCompareTokenAndGetTokenOfOpsForValue() {
         AuthInformation givenAuthInformation = new AuthInformation(null, null, 0, 0, "failToken", "failRefresh", null);
         doReturn(givenAuthInformation).when(mockValueOperations).get(givenRefresh);
-        assertThrows(RuntimeException.class, () ->
-                authService.getAuthDataInformation(givenToken));
+
+        AuthDataInformation authDataInformation = authService.getAuthDataInformation(givenToken);
+
+        assertThat(authDataInformation).isNull();
     }
 
     @Test
