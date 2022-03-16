@@ -275,17 +275,13 @@ class AuthServiceImplTest {
 
     @Test
     void reIssueToken_throwRunTimeExceptionAndPassesRefreshToGetOfOpsForValue() {
-        assertThrows(RuntimeException.class, () -> {
-            authService.reIssueToken(givenToken, givenRefreshNull);
-        });
+        assertThrows(RuntimeException.class, () -> authService.reIssueToken(givenToken, givenRefreshNull));
         verify(mockRedisTemplate.opsForValue()).get(eq(givenRefreshNull));
     }
 
     @Test
     void reIssueToken_throwRunTimeExceptionAndCompareTokenAndRefresh() {
-        assertThrows(RuntimeException.class, () -> {
-            authService.reIssueToken("testToken", givenRefresh);
-        });
+        assertThrows(RuntimeException.class, () -> authService.reIssueToken("testToken", givenRefresh));
     }
 
     @Test

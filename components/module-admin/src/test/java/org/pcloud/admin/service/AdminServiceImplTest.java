@@ -236,6 +236,7 @@ class AdminServiceImplTest {
         spyAuthClient.issueToken_returnValue = new JwtTokenResponse(givenToken, givenRefresh);
 
         adminService.login(givenRequest, givenResponse);
+
         assertThat(givenResponse.getHeader("access_token")).isEqualTo(givenToken);
         assertThat(givenResponse.getCookie("refresh_token").getValue()).isEqualTo(givenRefresh);
     }
