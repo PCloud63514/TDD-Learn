@@ -5,3 +5,11 @@ dependencies {
     implementation(project(":components:module-gateway"))
     implementation(project(":components:module-swagger"))
 }
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}

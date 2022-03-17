@@ -4,3 +4,11 @@ dependencies {
     implementation(project(":components:module-admin"))
     implementation(project(":components:module-swagger"))
 }
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
