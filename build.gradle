@@ -39,6 +39,10 @@ subprojects {
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+        annotationProcessor 'org.projectlombok:lombok'
+
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
     }

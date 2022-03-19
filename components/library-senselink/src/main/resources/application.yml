@@ -1,0 +1,4 @@
+sense-link:
+  url: http://10.10.40.139/sl/api/v5
+  app-key: c6324cfa50169e85 # SenseTime Key
+  app-secret: e30af86f8f4e75d128ba4288597dea3c # SenseTime Secret

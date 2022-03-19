@@ -3,6 +3,7 @@ dependencies {
 //    implementation "org.springframework.boot:spring-boot-starter-web"
     implementation(project(":components:module-admin"))
     implementation(project(":components:module-swagger"))
+    implementation(project(":components:library-senselink"))
 }
 
 bootJar {
