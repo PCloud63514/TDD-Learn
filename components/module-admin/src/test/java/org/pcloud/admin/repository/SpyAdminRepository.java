@@ -1,4 +1,4 @@
-package org.pcloud.admin.service;
+package org.pcloud.admin.repository;
 
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.repository.AdminRepository;

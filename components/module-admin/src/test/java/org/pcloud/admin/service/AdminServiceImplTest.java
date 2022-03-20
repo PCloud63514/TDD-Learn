@@ -10,6 +10,7 @@ import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.provider.StubLocalDateTimeProvider;
+import org.pcloud.admin.repository.SpyAdminRepository;
 import org.pcloud.gateway.data.response.JwtTokenResponse;
 import org.pcloud.gateway.utils.JwtAuthUtil;
 import org.springframework.data.domain.PageRequest;

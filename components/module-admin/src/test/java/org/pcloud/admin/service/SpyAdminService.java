@@ -1,4 +1,4 @@
-package org.pcloud.admin.api;
+package org.pcloud.admin.service;
 
 import org.pcloud.admin.data.request.AdminJoinRequest;
 import org.pcloud.admin.data.request.AdminLoginRequest;
