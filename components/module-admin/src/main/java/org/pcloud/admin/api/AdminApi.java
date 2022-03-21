@@ -1,10 +1,10 @@
 package org.pcloud.admin.api;
 
 import lombok.RequiredArgsConstructor;
-import org.pcloud.admin.data.request.AdminJoinRequest;
-import org.pcloud.admin.data.request.AdminLoginRequest;
-import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminGetsResponse;
+import org.pcloud.admin.service.AdminJoinRequest;
+import org.pcloud.admin.service.AdminLoginRequest;
+import org.pcloud.admin.service.AdminPasswordInitialRequest;
+import org.pcloud.admin.service.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.AdminService;
 import org.springframework.data.domain.PageRequest;

@@ -3,15 +3,11 @@ package org.pcloud.admin.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pcloud.admin.data.request.AdminJoinRequest;
-import org.pcloud.admin.data.request.AdminLoginRequest;
-import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.provider.StubInitializedPasswordProvider;
 import org.pcloud.admin.provider.StubLocalDateTimeProvider;
-import org.pcloud.admin.repository.SpyAdminRepository;
-import org.pcloud.gateway.data.response.JwtTokenResponse;
+import org.pcloud.admin.domain.SpyAdminRepository;
+import org.pcloud.gateway.network.JwtTokenResponse;
 import org.pcloud.gateway.utils.JwtAuthUtil;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -25,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.pcloud.admin.AdminFixtures.anAdmin;
 
 class AdminServiceImplTest {
     AdminServiceImpl adminService;
@@ -76,7 +73,7 @@ class AdminServiceImplTest {
     void joinAdmin_throwRunTimeException() {
         AdminJoinRequest givenAdminJoinRequest = new AdminJoinRequest("id", "password");
 
-        Assertions.assertThrows(RuntimeException.class, ()-> {
+        Assertions.assertThrows(RuntimeException.class, () -> {
             spyAdminRepository.findById_returnValue = Optional.of(Admin.builder().build());
             adminService.joinAdmin(givenAdminJoinRequest);
         });
@@ -136,7 +133,7 @@ class AdminServiceImplTest {
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
         String givenRole = "ADMIN";
         String givenStatus = "Default";
-        spyAdminRepository.findById_returnValue = Optional.of(Admin.builder()
+        spyAdminRepository.findById_returnValue = Optional.of(anAdmin()
                 .id(givenId)
                 .password("password")
                 .role(givenRole)
@@ -162,13 +159,8 @@ class AdminServiceImplTest {
     void passwordInit_passesIdToRepository() {
         String givenId = "id";
         AdminPasswordInitialRequest givenRequest = new AdminPasswordInitialRequest(givenId);
-        spyAdminRepository.findById_returnValue = Optional.of(Admin.builder()
+        spyAdminRepository.findById_returnValue = Optional.of(anAdmin()
                 .id(givenId)
-                .password("password")
-                .role("ADMIN")
-                .status("Default")
-                .needChangePassword(false)
-                .createAt(stubLocalDateTimeProvider.now())
                 .build());
 
         adminService.passwordInit(givenRequest);
@@ -249,9 +241,9 @@ class AdminServiceImplTest {
         AdminLoginRequest givenRequest = new AdminLoginRequest(givenId, givenPassword);
         HttpServletResponse givenResponse = new MockHttpServletResponse();
 
-        assertThrows(RuntimeException.class, ()-> {
+        assertThrows(RuntimeException.class, () -> {
             spyAdminRepository.findAdminByIdAndPassword_returnValue = Optional.empty();
-           adminService.login(givenRequest, givenResponse);
+            adminService.login(givenRequest, givenResponse);
         });
     }
 }

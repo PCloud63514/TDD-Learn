@@ -1,7 +1,7 @@
 package org.pcloud.gateway.service;
 
 import org.pcloud.gateway.data.AuthDataInformation;
-import org.pcloud.gateway.data.request.TokenIssueRequest;
+import org.pcloud.gateway.network.TokenIssueRequest;
 import org.pcloud.support.token.jwt.JwtToken;
 
 import java.util.Optional;

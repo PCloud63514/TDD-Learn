@@ -1,4 +1,4 @@
-package org.pcloud.gateway.data.request;
+package org.pcloud.gateway.network;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

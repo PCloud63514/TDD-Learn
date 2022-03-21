@@ -1,17 +1,12 @@
 package org.pcloud.admin.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pcloud.admin.data.request.AdminJoinRequest;
-import org.pcloud.admin.data.request.AdminLoginRequest;
-import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminGetsResponse;
-import org.pcloud.admin.data.response.AdminSearchResponse;
 import org.pcloud.admin.domain.Admin;
+import org.pcloud.admin.domain.AdminRepository;
 import org.pcloud.admin.provider.InitializedPasswordProvider;
 import org.pcloud.admin.provider.LocalDateTimeProvider;
-import org.pcloud.admin.repository.AdminRepository;
-import org.pcloud.gateway.data.request.TokenIssueRequest;
-import org.pcloud.gateway.data.response.JwtTokenResponse;
+import org.pcloud.gateway.network.TokenIssueRequest;
+import org.pcloud.gateway.network.JwtTokenResponse;
 import org.pcloud.gateway.network.AuthClient;
 import org.pcloud.gateway.utils.JwtAuthUtil;
 import org.springframework.data.domain.Page;

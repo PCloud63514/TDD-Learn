@@ -3,7 +3,7 @@ package org.pcloud.gateway.service;
 import lombok.RequiredArgsConstructor;
 import org.pcloud.gateway.data.AuthDataInformation;
 import org.pcloud.gateway.data.AuthInformation;
-import org.pcloud.gateway.data.request.TokenIssueRequest;
+import org.pcloud.gateway.network.TokenIssueRequest;
 import org.pcloud.support.token.core.UuidProvider;
 import org.pcloud.support.token.jwt.JwtToken;
 import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;

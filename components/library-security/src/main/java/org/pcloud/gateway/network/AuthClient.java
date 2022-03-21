@@ -1,7 +1,5 @@
 package org.pcloud.gateway.network;
 
-import org.pcloud.gateway.data.request.TokenIssueRequest;
-import org.pcloud.gateway.data.response.JwtTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

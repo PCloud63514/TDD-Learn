@@ -3,19 +3,10 @@ package org.pcloud.gateway.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.pcloud.gateway.data.request.TokenIssueRequest;
-import org.pcloud.gateway.data.response.JwtTokenResponse;
+import org.pcloud.gateway.network.TokenIssueRequest;
 import org.pcloud.support.token.jwt.JwtToken;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.HashMap;
@@ -23,10 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 class AuthApiTest {
     private WebTestClient webTestClient;
@@ -37,6 +29,7 @@ class AuthApiTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         spyAuthService = new SpyAuthService();
+
         webTestClient = WebTestClient.bindToController(new AuthApi(spyAuthService))
                 .configureClient()
                 .build();
@@ -50,12 +43,13 @@ class AuthApiTest {
         long givenValidity = 10000;
         long givenRefreshValidity = 100000;
         TokenIssueRequest givenRequest = new TokenIssueRequest(givenIssueRequestDomain, givenRole, givenData, givenValidity, givenRefreshValidity);
+
         spyAuthService.generateToken_returnValue = new JwtToken("token", "refresh");
 
         webTestClient.post()
                 .uri("/auth")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(givenRequest))
+                .body(BodyInserters.fromValue(givenRequest))
                 .exchange().expectStatus().isCreated();
     }
 
@@ -68,7 +62,7 @@ class AuthApiTest {
         webTestClient.post()
                 .uri("/auth")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject("{}"))
+                .body(BodyInserters.fromValue("{}"))
                 .exchange()
                 .expectBody()
                 .jsonPath("$.accessToken").isEqualTo(givenStrToken)
@@ -94,7 +88,7 @@ class AuthApiTest {
         webTestClient.post()
                 .uri("/auth")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(givenRequest))
+                .body(BodyInserters.fromValue(givenRequest))
                 .exchange();
 
         assertThat(spyAuthService.generateToken_argumentRequest.getRole()).isEqualTo(givenRole);

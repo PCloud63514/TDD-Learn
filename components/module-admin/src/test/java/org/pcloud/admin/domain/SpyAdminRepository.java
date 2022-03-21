@@ -1,8 +1,10 @@
-package org.pcloud.admin.repository;
+package org.pcloud.admin.domain;
 
-import org.pcloud.admin.domain.Admin;
-import org.pcloud.admin.repository.AdminRepository;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
 import java.util.ArrayList;

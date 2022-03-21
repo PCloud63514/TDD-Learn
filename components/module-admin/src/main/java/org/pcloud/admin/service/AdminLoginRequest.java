@@ -1,4 +1,4 @@
-package org.pcloud.admin.data.request;
+package org.pcloud.admin.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

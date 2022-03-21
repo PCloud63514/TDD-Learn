@@ -3,11 +3,11 @@ package org.pcloud.admin.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pcloud.admin.data.request.AdminJoinRequest;
-import org.pcloud.admin.data.request.AdminLoginRequest;
-import org.pcloud.admin.data.request.AdminPasswordInitialRequest;
-import org.pcloud.admin.data.response.AdminSearchResponse;
-import org.pcloud.admin.data.response.AdminGetsResponse;
+import org.pcloud.admin.service.AdminJoinRequest;
+import org.pcloud.admin.service.AdminLoginRequest;
+import org.pcloud.admin.service.AdminPasswordInitialRequest;
+import org.pcloud.admin.service.AdminSearchResponse;
+import org.pcloud.admin.service.AdminGetsResponse;
 import org.pcloud.admin.domain.Admin;
 import org.pcloud.admin.service.SpyAdminService;
 import org.springframework.http.MediaType;
@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.pcloud.admin.AdminFixtures.anAdmin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,13 +45,7 @@ class AdminApiTest {
 
     @Test
     void joinAdmin_returnAdmin() throws Exception {
-        spyAdminService.joinAdmin_returnValue = Admin.builder()
-                .id("id")
-                .password("password")
-                .role("ADMIN")
-                .status("Default")
-                .needChangePassword(true)
-                .createAt(LocalDateTime.of(2022, 2, 22, 20, 20, 20))
+        spyAdminService.joinAdmin_returnValue = anAdmin()
                 .build();
 
         mockMvc.perform(post("/admin/join")
@@ -58,10 +53,10 @@ class AdminApiTest {
                         .content("{}"))
                 .andExpect(jsonPath("$.id", equalTo("id")))
                 .andExpect(jsonPath("$.password", equalTo("password")))
-                .andExpect(jsonPath("$.role", equalTo("ADMIN")))
-                .andExpect(jsonPath("$.status", equalTo("Default")))
+                .andExpect(jsonPath("$.role", equalTo("role")))
+                .andExpect(jsonPath("$.status", equalTo("status")))
                 .andExpect(jsonPath("$.needChangePassword", equalTo(true)))
-                .andExpect(jsonPath("$.createAt", equalTo("2022-02-22 20:20:20")))
+                .andExpect(jsonPath("$.createAt", equalTo("2022-02-02 02:02:00")))
                 .andExpect(status().isCreated());
     }
 

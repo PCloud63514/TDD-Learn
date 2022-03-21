@@ -1,4 +1,4 @@
-package org.pcloud.admin.data.request;
+package org.pcloud.admin.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class AdminPasswordInitialRequest {
+public class AdminJoinRequest {
     private String id;
+    private String password;
 }

@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.pcloud.gateway.api.SpyJwtTokenProvider;
 import org.pcloud.gateway.data.AuthDataInformation;
 import org.pcloud.gateway.data.AuthInformation;
-import org.pcloud.gateway.data.request.TokenIssueRequest;
+import org.pcloud.gateway.network.TokenIssueRequest;
 import org.pcloud.support.token.jwt.JwtToken;
 import org.pcloud.support.token.jwt.JwtTokenGenerateRequest;
 import org.springframework.data.redis.core.HashOperations;
@@ -94,7 +94,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void generateToken_passesTokenToSetOfOpsForValue() {
+    void generateToken_setTokenInRedisTemplate() {
         TokenIssueRequest givenRequest = getOkTokenIssueRequest();
         spyJwtTokenProvider.generate_returnValue = new JwtToken(givenToken, givenRefresh);
 

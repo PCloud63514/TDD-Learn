@@ -1,4 +1,4 @@
-package org.pcloud.admin.data.response;
+package org.pcloud.admin.service;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,5 @@
-package org.pcloud.admin.repository;
+package org.pcloud.admin.domain;
 
-import org.pcloud.admin.domain.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
