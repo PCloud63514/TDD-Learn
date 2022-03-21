@@ -6,7 +6,7 @@ import feign.Response;
 import feign.codec.DecodeException;
 import feign.jackson.JacksonDecoder;
 import lombok.RequiredArgsConstructor;
-import org.pcloud.senselink.data.response.SenseLinkResponse;
+import org.pcloud.senselink.client.SenseLinkResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

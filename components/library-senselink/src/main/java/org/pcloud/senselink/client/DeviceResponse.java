@@ -1,4 +1,4 @@
-package org.pcloud.senselink.data.response;
+package org.pcloud.senselink.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

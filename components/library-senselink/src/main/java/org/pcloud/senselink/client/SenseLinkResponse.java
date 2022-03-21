@@ -1,4 +1,4 @@
-package org.pcloud.senselink.data.response;
+package org.pcloud.senselink.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
