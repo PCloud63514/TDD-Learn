@@ -19,7 +19,6 @@ public final class SenseLinkAuthInterceptor implements RequestInterceptor {
         String timeStamp = String.valueOf(new Date().getTime());
         String sign = timeStamp + "#" + senseLinkProperties.getAppSecret();
         String signMd5 = MD5Provider.encode(sign);
-
         template.header("appKey", senseLinkProperties.getAppKey());
         template.header("timestamp", timeStamp);
         template.header("sign", signMd5);

@@ -45,14 +45,13 @@ class AdminServiceImplTest {
         AdminJoinRequest givenAdminJoinRequest = new AdminJoinRequest("id", "password");
         spyAdminRepository.findById_returnValue = Optional.empty();
 
-        Admin admin = adminService.joinAdmin(givenAdminJoinRequest);
+        AdminJoinResponse adminJoinResponse = adminService.joinAdmin(givenAdminJoinRequest);
 
         assertThat(spyAdminRepository.findById_argumentId).isEqualTo("id");
-        assertThat(admin.getId()).isEqualTo(givenAdminJoinRequest.getId());
-        assertThat(admin.getPassword()).isEqualTo(givenAdminJoinRequest.getPassword());
-        assertThat(admin.getRole()).isEqualTo("ADMIN");
-        assertThat(admin.getStatus()).isEqualTo("Default");
-        assertThat(admin.getCreateAt()).isEqualTo(stubLocalDateTimeProvider.now());
+        assertThat(adminJoinResponse.getId()).isEqualTo(givenAdminJoinRequest.getId());
+        assertThat(adminJoinResponse.getRole()).isEqualTo("ADMIN");
+        assertThat(adminJoinResponse.getStatus()).isEqualTo("Default");
+        assertThat(adminJoinResponse.getCreateAt()).isEqualTo(stubLocalDateTimeProvider.now());
     }
 
     @Test

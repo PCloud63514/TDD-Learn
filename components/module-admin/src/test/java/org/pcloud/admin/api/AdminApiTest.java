@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pcloud.admin.service.AdminJoinRequest;
+import org.pcloud.admin.service.AdminJoinResponse;
 import org.pcloud.admin.service.AdminLoginRequest;
 import org.pcloud.admin.service.AdminPasswordInitialRequest;
 import org.pcloud.admin.service.AdminSearchResponse;
@@ -45,14 +46,13 @@ class AdminApiTest {
 
     @Test
     void joinAdmin_returnAdmin() throws Exception {
-        spyAdminService.joinAdmin_returnValue = anAdmin()
-                .build();
+        Admin givenAdmin = anAdmin().build();
+        spyAdminService.joinAdmin_returnValue = new AdminJoinResponse(givenAdmin.getId(), givenAdmin.getRole(), givenAdmin.getStatus(), givenAdmin.isNeedChangePassword(), givenAdmin.getCreateAt());
 
         mockMvc.perform(post("/admin/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(jsonPath("$.id", equalTo("id")))
-                .andExpect(jsonPath("$.password", equalTo("password")))
                 .andExpect(jsonPath("$.role", equalTo("role")))
                 .andExpect(jsonPath("$.status", equalTo("status")))
                 .andExpect(jsonPath("$.needChangePassword", equalTo(true)))

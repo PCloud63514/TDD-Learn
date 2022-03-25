@@ -2,6 +2,7 @@ package org.pcloud.admin.api;
 
 import lombok.RequiredArgsConstructor;
 import org.pcloud.admin.service.AdminJoinRequest;
+import org.pcloud.admin.service.AdminJoinResponse;
 import org.pcloud.admin.service.AdminLoginRequest;
 import org.pcloud.admin.service.AdminPasswordInitialRequest;
 import org.pcloud.admin.service.AdminGetsResponse;
@@ -23,7 +24,7 @@ public class AdminApi {
 
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping("join")
-    public Admin joinAdmin(@RequestBody AdminJoinRequest request) {
+    public AdminJoinResponse joinAdmin(@RequestBody AdminJoinRequest request) {
         return adminService.joinAdmin(request);
     }
 

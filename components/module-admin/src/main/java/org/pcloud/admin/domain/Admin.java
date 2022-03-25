@@ -1,11 +1,12 @@
 package org.pcloud.admin.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
@@ -20,7 +21,8 @@ public class Admin {
     private String role;
     private String status;
     private boolean needChangePassword;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @CreatedDate
+    @Column(name = "create_at", insertable = false, updatable = false, nullable = false)
     private LocalDateTime createAt;
 
     @Builder

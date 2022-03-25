@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface AdminService {
-    Admin joinAdmin(AdminJoinRequest request);
+    AdminJoinResponse joinAdmin(AdminJoinRequest request);
 
     AdminGetsResponse getAdmins(PageRequest pageRequest);
 

@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class SpyAdminService implements AdminService {
-    public Admin joinAdmin_returnValue;
+    public AdminJoinResponse joinAdmin_returnValue;
     public AdminJoinRequest joinAdmin_argumentRequest;
     public AdminGetsResponse getAdmins_returnValue;
     public PageRequest getAdmins_argumentRequest;
@@ -18,7 +18,7 @@ public class SpyAdminService implements AdminService {
     public HttpServletResponse login_argumentHttpServletResponse;
 
     @Override
-    public Admin joinAdmin(AdminJoinRequest request) {
+    public AdminJoinResponse joinAdmin(AdminJoinRequest request) {
         this.joinAdmin_argumentRequest = request;
         return joinAdmin_returnValue;
     }
